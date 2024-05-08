@@ -1,0 +1,21 @@
+<template lang="pug">
+q-btn(flat @click="openLanguagesMenu" round dense )
+  q-avatar
+    img(:src="languageImage(languagesStore?.currentLanguage)")
+q-toolbar-title.text-capitalize {{ $t(languagesStore.currentLanguage) }}
+</template>
+
+<script setup>
+import useUtils from 'src/composables/useUtils.ts';
+//Store
+import { useDrawersStore } from 'src/stores/drawersStore';
+import { useLanguagesStore } from 'src/stores/languagesStore';
+//
+const drawersStore = useDrawersStore();
+const languagesStore = useLanguagesStore();
+
+const openLanguagesMenu = () => {
+  drawersStore.setIsLangugesMenuOpen(true);
+};
+const { languageImage } = useUtils();
+</script>

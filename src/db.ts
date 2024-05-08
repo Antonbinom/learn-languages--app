@@ -2,16 +2,16 @@
 import Dexie, { Table } from 'dexie';
 
 export interface Vocabulary {
-  name: string;
+  lang: string;
   terms: Term[];
 }
 export interface PhrasalVerbs {
-  name: string;
+  lang: string;
   terms: Term[];
 }
-export interface Collection {
+export interface WordsSets {
   name: string;
-  language: string;
+  lang: string;
   terms: string[];
 }
 
@@ -27,12 +27,14 @@ interface Term {
 export class MySubClassedDexie extends Dexie {
   vocabularies!: Table<Vocabulary>;
   phrasalVerbs!: Table<PhrasalVerbs>;
+  wordsSets!: Table<WordsSets>;
 
   constructor() {
     super('learnLanguagesAppDB');
     this.version(1).stores({
-      vocabularies: '++id, name, terms',
-      phrasalVerbs: '++id, name, terms',
+      vocabularies: '++id, lang, terms',
+      phrasalVerbs: '++id, lang, terms',
+      wordsSets: '++id, name, lang, terms',
     });
   }
 }

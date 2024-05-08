@@ -1,6 +1,6 @@
 <template lang="pug">
 .flex.justify-between.items-center.q-my-md
-  .text-h6 {{ $t(currentPageTitle) }}
+  .text-h6.text-capitalize {{ $t(currentPageTitle) }}
   q-btn(
     @click="drawersStore.setIsAddTermOpen(true)"
     square

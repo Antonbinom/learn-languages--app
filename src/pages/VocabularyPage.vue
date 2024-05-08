@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page.items-center.justify-evenly
+q-page
   SearchComponent
   ListComponent(
     :items="currentLanguageWords")
@@ -20,24 +20,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getVocabulary } = useVocabulary();
+const { getVocabularyTerms } = useVocabulary();
 
 const { $on } = useAppEventBus();
 
 let currentLanguageWords = ref();
 
 $on('request-vocabulary', () => {
-  currentLanguageWords.value = useObservable(getVocabulary());
+  currentLanguageWords.value = useObservable(getVocabularyTerms());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    currentLanguageWords.value = useObservable(getVocabulary());
+    currentLanguageWords.value = useObservable(getVocabularyTerms());
   }
 );
 
 onMounted(async () => {
-  currentLanguageWords.value = useObservable(getVocabulary());
+  currentLanguageWords.value = useObservable(getVocabularyTerms());
 });
 </script>

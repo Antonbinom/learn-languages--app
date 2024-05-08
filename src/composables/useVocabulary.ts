@@ -19,31 +19,14 @@ export const useVocabulary = () => {
   });
 
   const createVocabulary = async () => {
-    await db.vocabularies.add({ name: currentLanguage.value, terms: [] });
+    await db.vocabularies.add({ lang: currentLanguage.value, terms: [] });
   };
 
   const getAllVocabularies = () => liveQuery(() => db.vocabularies.toArray());
 
-  // const getVocabulary = () => {
-  //   const vocabulary = liveQuery(() =>
-  //     db.vocabularies
-  //       .where('name')
-  //       .equals(currentLanguage.value)
-  //       .first()
-  //       .then((res) =>
-  //         res?.terms.filter((item) => {
-  //           return (
-  //             item.term.includes(languagesStore.searchValue.toLowerCase()) ||
-  //             item.translation.includes(
-  //               languagesStore.searchValue.toLowerCase()
-  //             )
-  //           );
-  //         })
-  //       )
-  //   );
-
-  //   return vocabulary;
-  // };
+  const getVocabulary = () => {
+    return db.vocabularies.where('lang').equals(currentLanguage.value).first();
+  };
 
   const getFilteredTerms = (terms: Term[], searchTerm: string) => {
     const searchLower = searchTerm.toLowerCase();
@@ -54,17 +37,11 @@ export const useVocabulary = () => {
     );
   };
 
-  const getVocabulary = () => {
-    const languageName = currentLanguage.value;
-
-    const vocabularyPromise = db.vocabularies
-      .where('name')
-      .equals(languageName)
-      .first()
-      .then((res) => res?.terms || []);
+  const getVocabularyTerms = () => {
+    const vocabulary = getVocabulary().then((res) => res?.terms || []);
 
     const filteredVocabulary = liveQuery(() =>
-      vocabularyPromise.then((terms) =>
+      vocabulary.then((terms) =>
         getFilteredTerms(terms, languagesStore.searchValue)
       )
     );
@@ -73,8 +50,11 @@ export const useVocabulary = () => {
   };
 
   const addNewVocabularyTerm = async (term: Term) => {
+    if (!(await getVocabulary())) {
+      await createVocabulary();
+    }
     await db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((vocabulary) => {
         vocabulary.terms.push(term);
@@ -84,7 +64,7 @@ export const useVocabulary = () => {
 
   const getVocabularyTerm = async (name: string) => {
     const vocabulary = await db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -95,7 +75,7 @@ export const useVocabulary = () => {
 
   const removeVocabularyTerm = async (termId: string) => {
     const vocabulary = await db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -103,7 +83,7 @@ export const useVocabulary = () => {
     if (termIndex === undefined) return;
 
     db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((vocabulary) => {
         vocabulary.terms.splice(termIndex, 1);
@@ -112,7 +92,7 @@ export const useVocabulary = () => {
 
   const editVocabularyTerm = async (termId: string, data: Term) => {
     const vocabulary = await db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -120,7 +100,7 @@ export const useVocabulary = () => {
     if (termIndex === undefined) return;
 
     await db.vocabularies
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((vocabulary) => {
         vocabulary.terms[termIndex] = data;
@@ -131,7 +111,7 @@ export const useVocabulary = () => {
   return {
     createVocabulary,
     getAllVocabularies,
-    getVocabulary,
+    getVocabularyTerms,
     addNewVocabularyTerm,
     removeVocabularyTerm,
     editVocabularyTerm,

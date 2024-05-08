@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/MainPageLayout.vue'),
     children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
   },
   {
@@ -16,8 +16,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/VocabularyPage.vue'),
       },
       {
-        path: 'collections',
-        component: () => import('pages/CollectionsPage.vue'),
+        path: 'sets',
+        children: [
+          { path: '', component: () => import('pages/WordsSetsPage.vue') },
+          {
+            path: 'create',
+            component: () => import('pages/CreateWordsSetPage.vue'),
+          },
+        ],
       },
     ],
   },

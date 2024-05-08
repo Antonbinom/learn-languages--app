@@ -16,14 +16,19 @@ export const pages: Page[] = [
         path: '/words/vocabulary',
       },
       {
-        name: 'collections',
-        label: 'Collections',
-        path: '/words/collections',
+        name: 'words sets',
+        label: 'Words sets',
+        path: '/words/sets',
       },
       {
         name: 'trainings',
         label: 'Trainings',
         path: '/words/trainings',
+      },
+      {
+        name: 'create',
+        label: 'Create',
+        path: '/words/sets/create',
       },
     ],
   },

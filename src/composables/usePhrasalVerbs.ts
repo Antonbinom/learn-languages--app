@@ -19,7 +19,7 @@ export const usePhrasalVerbs = () => {
   });
 
   const createPhrasalVerbsCollection = async () => {
-    await db.phrasalVerbs.add({ name: currentLanguage.value, terms: [] });
+    await db.phrasalVerbs.add({ lang: currentLanguage.value, terms: [] });
   };
 
   const getFilteredTerms = (terms: Term[], searchTerm: string) => {
@@ -35,7 +35,7 @@ export const usePhrasalVerbs = () => {
     const languageName = currentLanguage.value;
 
     const phrasalVerbsPromise = db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(languageName)
       .first()
       .then((res) => res?.terms || []);
@@ -54,7 +54,7 @@ export const usePhrasalVerbs = () => {
       await createPhrasalVerbsCollection();
     }
     await db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((collection) => {
         collection.terms.push(term);
@@ -64,7 +64,7 @@ export const usePhrasalVerbs = () => {
 
   const getPhrasalVerb = async (name: string) => {
     const collection = await db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -75,7 +75,7 @@ export const usePhrasalVerbs = () => {
 
   const removePhrasalVerb = async (termId: string) => {
     const collection = await db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -83,7 +83,7 @@ export const usePhrasalVerbs = () => {
     if (termIndex === undefined) return;
 
     db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((collection) => {
         collection.terms.splice(termIndex, 1);
@@ -92,7 +92,7 @@ export const usePhrasalVerbs = () => {
 
   const editPhrasalVerb = async (termId: string, data: Term) => {
     const collection = await db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .first();
 
@@ -100,7 +100,7 @@ export const usePhrasalVerbs = () => {
     if (termIndex === undefined) return;
 
     await db.phrasalVerbs
-      .where('name')
+      .where('lang')
       .equals(currentLanguage.value)
       .modify((collection) => {
         collection.terms[termIndex] = data;

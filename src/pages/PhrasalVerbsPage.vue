@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page.items-center.justify-evenly
+q-page
   SearchComponent
   ListComponent(
     :items="currentLanguageWords")
