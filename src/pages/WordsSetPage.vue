@@ -6,7 +6,7 @@ q-page
     :placeholder="$t('set name')"
     )
   SearchComponent.q-pb-md
-  .text-h6.bg-grey-3 Add words
+  .text-h6.bg-grey-3 Add words in a set
   q-scroll-area.q-pr-sm.q-py-md(v-if="filteredTerms" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
     q-item.q-px-none(
       dense
@@ -24,13 +24,13 @@ q-page
         icon="add"
         @click="addTerm(item.id)"
       )
-  .text-h6.bg-grey-3 Added words
+  .text-h6.bg-grey-3 Words in a set
   q-scroll-area.q-pr-sm.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
     q-item.q-px-none(
       dense
-      v-for="(item, index) in addedTerms"
+      v-for="(item, index) in setTerms"
       :key="item.id"
-      :style="(addedTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
+      :style="(setTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
       )
       q-item-section
         q-item-label {{ item.term}}
@@ -42,32 +42,41 @@ q-page
         icon="remove"
         @click="removeTerm(item.id)"
       )
-  q-btn.q-mt-md(
-    :disabled="!(setName && addedTerms.length)"
-    color="positive"
-    :label="$t('create new set')"
-    style="width: 100%"
-    @click="createSet"
-  )
+  q-btn-group(spread flat)
+    q-btn.q-mr-md(
+      color="negative"
+      :label="$t('delete')"
+      @click="removeSet"
+    )
+    q-btn(
+      :disabled="!(setName && setTerms.length)"
+      color="positive"
+      :label="$t('save')"
+      @click="saveSet"
+    )
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { db } from 'src/db';
+import useUtils from 'src/composables/useUtils';
+
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { useWordsSets } from 'src/composables/useWordsSets';
 //Components
 import SearchComponent from 'components/SearchComponent.vue';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const languageStore = useLanguagesStore();
 
-const { addTermsToWordsSet } = useWordsSets();
-const router = useRouter();
+const { addTermsToWordsSet, removeWordsSet } = useWordsSets();
+const route = useRoute();
 const scrollAreaHeight = ref();
 const setName = ref('');
 const vocabularyTerms = ref();
-const addedTerms = ref([]);
+const { toPreviousePage } = useUtils();
+
+const setTerms = ref([]);
 
 const filteredTerms = computed(() => {
   return vocabularyTerms.value
@@ -77,26 +86,27 @@ const filteredTerms = computed(() => {
 
 const addTerm = (id) => {
   const termIndex = vocabularyTerms.value.findIndex((term) => term.id === id);
-  addedTerms.value = [
-    vocabularyTerms.value[termIndex],
-    ...addedTerms.value,
-  ].sort((a, b) => a.term.localeCompare(b.term));
+  setTerms.value = [vocabularyTerms.value[termIndex], ...setTerms.value].sort(
+    (a, b) => a.term.localeCompare(b.term)
+  );
   vocabularyTerms.value.splice(termIndex, 1);
 };
 
 const removeTerm = (id) => {
-  const termIndex = addedTerms.value.findIndex((term) => term.id === id);
-  vocabularyTerms.value = [
-    addedTerms.value[termIndex],
-    ...vocabularyTerms.value,
-  ];
-  addedTerms.value.splice(termIndex, 1);
+  const termIndex = setTerms.value.findIndex((term) => term.id === id);
+  vocabularyTerms.value = [setTerms.value[termIndex], ...vocabularyTerms.value];
+  setTerms.value.splice(termIndex, 1);
 };
-const createSet = async () => {
-  if (!setName.value || !addedTerms.value) return;
-  const termsIds = addedTerms.value.map((term) => term.id);
-  await addTermsToWordsSet(setName.value.toLowerCase(), termsIds);
-  router.push('/words/sets');
+
+const saveSet = async () => {
+  if (!setName.value) return;
+  const termsIds = setTerms.value.map((term) => term.id);
+  await addTermsToWordsSet(setName.value, termsIds);
+};
+
+const removeSet = async () => {
+  await removeWordsSet(setName.value);
+  toPreviousePage();
 };
 
 onMounted(async () => {
@@ -105,8 +115,17 @@ onMounted(async () => {
     .equals(languageStore.currentLanguage)
     .first();
 
-  vocabularyTerms.value = terms;
+  const { terms: setTermsIds, name } = await db.wordsSets
+    .where('lang')
+    .equals(languageStore.currentLanguage)
+    .and((set) => set.name === route.params.name)
+    .first();
 
+  vocabularyTerms.value = terms.filter(
+    (item) => !setTermsIds.includes(item.id)
+  );
+  setTerms.value = terms.filter((item) => setTermsIds.includes(item.id));
+  setName.value = name;
   scrollAreaHeight.value =
     (document.getElementsByClassName('q-page')[0]?.clientHeight - 280) / 2 +
     'px';

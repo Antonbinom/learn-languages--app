@@ -18,4 +18,7 @@ export default {
   back: 'back',
   create: 'create',
   'set name': 'set name',
+  save: 'save',
+  delete: 'delete',
+  'create new set': 'create new set',
 };

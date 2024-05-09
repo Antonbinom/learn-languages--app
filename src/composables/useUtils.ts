@@ -1,8 +1,9 @@
 import { pages } from 'src/data';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const useUtils = () => {
+  const router = useRouter();
   const route = useRoute();
 
   const languageImage = (language: string) => {
@@ -19,7 +20,15 @@ const useUtils = () => {
     } else return '';
   });
 
-  return { languageImage, currentPageTitle };
+  const toPreviousePage = () => {
+    if (route.path.split('/').length === 2) router.push('/');
+    else {
+      const prevRoutePath = route.path.split('/').slice(0, -1).join('/');
+      router.push(prevRoutePath);
+    }
+  };
+
+  return { languageImage, currentPageTitle, toPreviousePage };
 };
 
 export default useUtils;

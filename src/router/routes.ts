@@ -17,15 +17,29 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'sets',
-        children: [
-          { path: '', component: () => import('pages/WordsSetsPage.vue') },
-          {
-            path: 'create',
-            component: () => import('pages/CreateWordsSetPage.vue'),
-          },
-        ],
+        component: () => import('pages/WordsSetsPage.vue'),
+        // children: [
+        //   { path: '', component: () => import('pages/WordsSetsPage.vue') },
+        //   {
+        //     path: 'create',
+        //     component: () => import('pages/CreateWordsSetPage.vue'),
+        //   },
+        // ],
       },
+      // { path: 'sets/:name', component: () => import('pages/WordsSetPage.vue') },
     ],
+  },
+  {
+    path: '/words/sets/create',
+    component: () => import('layouts/NoFooterLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CreateWordsSetPage.vue') },
+    ],
+  },
+  {
+    path: '/words/sets/:name',
+    component: () => import('layouts/NoFooterLayout.vue'),
+    children: [{ path: '', component: () => import('pages/WordsSetPage.vue') }],
   },
   {
     path: '/phrasal-verbs',

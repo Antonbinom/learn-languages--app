@@ -35,14 +35,29 @@ export const useWordsSets = () => {
       .equals(currentLanguage.value)
       .and((set) => set.name === name)
       .modify((set) => {
-        set.terms = [...termsIds, ...set.terms];
+        set.terms = [...new Set([...termsIds])];
       });
+  };
+
+  const removeWordsSet = async (name: string) => {
+    if (!(await getWordsSet(name))) {
+      console.log(
+        `${currentLanguage.value} set with name ${name} does not exist`
+      );
+    } else {
+      await db.wordsSets
+        .where('lang')
+        .equals(currentLanguage.value)
+        .and((set) => set.name === name)
+        .delete();
+    }
   };
 
   return {
     createWordsSet,
     getAllWordsSets,
     getWordsSet,
+    removeWordsSet,
     addTermsToWordsSet,
   };
 };
