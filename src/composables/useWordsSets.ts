@@ -1,17 +1,17 @@
 import { db } from 'src/db';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
-// import useAppEventBus from 'src/composables/useAppEventBus';
+import useAppEventBus from 'src/composables/useAppEventBus';
 
 export const useWordsSets = () => {
-  // const { $emit } = useAppEventBus();
+  const { $emit } = useAppEventBus();
   const languagesStore = useLanguagesStore();
   const currentLanguage = computed(() => {
     return languagesStore.currentLanguage;
   });
 
-  const createWordsSet = async (name: string) => {
-    await db.wordsSets.add({ name, lang: currentLanguage.value, terms: [] });
+  const createWordsSet = async (name: string, terms: string[]) => {
+    await db.wordsSets.add({ name, lang: currentLanguage.value, terms });
   };
 
   const getAllWordsSets = async () => await db.wordsSets.toArray();
@@ -26,16 +26,18 @@ export const useWordsSets = () => {
     return wordsSet;
   };
 
-  const addTermsToWordsSet = async (name: string, termsIds: string[]) => {
-    if (!(await getWordsSet(name))) {
-      await createWordsSet(name);
-    }
+  const editWordsSet = async (
+    name: string,
+    changedName: string,
+    termsIds: string[]
+  ) => {
     await db.wordsSets
       .where('lang')
       .equals(currentLanguage.value)
       .and((set) => set.name === name)
       .modify((set) => {
         set.terms = [...new Set([...termsIds])];
+        set.name = changedName;
       });
   };
 
@@ -51,6 +53,7 @@ export const useWordsSets = () => {
         .and((set) => set.name === name)
         .delete();
     }
+    $emit('request-words-sets');
   };
 
   return {
@@ -58,6 +61,6 @@ export const useWordsSets = () => {
     getAllWordsSets,
     getWordsSet,
     removeWordsSet,
-    addTermsToWordsSet,
+    editWordsSet,
   };
 };

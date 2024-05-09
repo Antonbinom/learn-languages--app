@@ -19,6 +19,9 @@ export default {
   create: 'create',
   'set name': 'set name',
   save: 'save',
+  'save changes': 'save changes',
   delete: 'delete',
+  edit: 'edit',
   'create new set': 'create new set',
+  'save and exit': 'save and exit',
 };

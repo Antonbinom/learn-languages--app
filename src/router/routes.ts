@@ -39,7 +39,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/words/sets/:name',
     component: () => import('layouts/NoFooterLayout.vue'),
-    children: [{ path: '', component: () => import('pages/WordsSetPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/WordsSetPage.vue') },
+      // { path: 'edit', component: () => import('pages/EditWordsSetPage.vue') },
+    ],
+  },
+  {
+    path: '/words/sets/edit/:name',
+    component: () => import('layouts/NoFooterLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/EditWordsSetPage.vue'),
+      },
+    ],
   },
   {
     path: '/phrasal-verbs',

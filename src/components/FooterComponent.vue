@@ -8,7 +8,7 @@ q-footer(elevated)
     mobile-arrows
     class="text-grey-5 shadow-2")
     q-tab(
-      v-for="tab in pages"
+      v-for="tab in pages()"
       :key="tab.name"
       :name="tab.name"
       :label="tab.label"
@@ -17,17 +17,16 @@ q-footer(elevated)
 </template>
 
 <script setup>
-import {pages} from '../data'
+import { pages } from '../data';
 import { onMounted, ref } from 'vue';
 
 import { useRoute } from 'vue-router';
-const route = useRoute()
+const route = useRoute();
 
-const tab = ref('words')
+const tab = ref('words');
 
 onMounted(() => {
-  const currentTab = pages.find(item => item.path === route.path)
-  tab.value = currentTab?.name
-})
+  const currentTab = pages?.().find((item) => item.path === route.path);
+  tab.value = currentTab?.name;
+});
 </script>
-

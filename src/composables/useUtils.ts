@@ -12,7 +12,7 @@ const useUtils = () => {
   };
 
   const currentPageTitle = computed(() => {
-    const rootPage = pages.find((page) => route.path.includes(page.path));
+    const rootPage = pages?.().find((page) => route.path.includes(page.path));
     if (rootPage?.path === route.path) {
       return rootPage.name;
     } else if (rootPage?.children) {
@@ -22,7 +22,9 @@ const useUtils = () => {
 
   const toPreviousePage = () => {
     if (route.path.split('/').length === 2) router.push('/');
-    else {
+    else if (route.path === `/words/sets/edit/${route.params.name}`) {
+      router.push('/words/sets');
+    } else {
       const prevRoutePath = route.path.split('/').slice(0, -1).join('/');
       router.push(prevRoutePath);
     }
