@@ -1,16 +1,23 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-pb-md
+  SearchComponent.q-px-md
   q-scroll-area.q-pr-sm.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
-    q-item.q-px-none(
-      dense
-      v-for="(item, index) in filteredTerms"
+    q-item.q-px-none.list-item(
+      v-for="(item) in filteredTerms"
       :key="item.id"
-      :style="(filteredTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
+      :style="{'border-bottom': '1px solid gray'}"
       )
-      q-item-section
-        q-item-label {{ item.term }} - {{ item.translation }}
-        q-item-label(caption) {{ item?.explanation }}
+      q-expansion-item.list-item__accordion(
+        dense
+        style="width: 200%"
+        :hide-expand-icon="!item.explanation"
+        expand-icon-toggle
+        expand-separator
+        :caption="item.translation"
+        :label="`${item.term}`"
+        )
+        q-card(v-if="item.explanation")
+          q-card-section {{ item.explanation }}
 </template>
 
 <script setup>
@@ -58,3 +65,9 @@ onMounted(async () => {
     document.getElementsByClassName('q-page')[0]?.clientHeight - 80 + 'px';
 });
 </script>
+
+<style lang="scss">
+.list-item {
+  cursor: pointer;
+}
+</style>

@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page
-  SearchComponent
+  SearchComponent.q-px-md
   ListComponent(
     :items="currentLanguageWords")
 </template>

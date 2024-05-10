@@ -24,4 +24,5 @@ export default {
   edit: 'edit',
   'create new set': 'create new set',
   'save and exit': 'save and exit',
+  'add to training': 'add to training',
 };

@@ -1,37 +1,54 @@
 <template lang="pug">
-.flex.justify-between.items-center.q-my-md
-  .text-h6.text-capitalize {{ $t(currentPageTitle) }}
+q-scroll-area.q-mt-md(
+  v-if="itemsRef?.value"
+  :style="{height:  scrollAreaHeight}"
+  :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }"
+  :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+  q-item.q-px-none.list-item(
+    v-close-popup
+    v-for="(item, index) in itemsRef.value"
+    :key="item.id"
+    :style="{'border-bottom': (itemsRef?.value.length-1 !== index) ? '1px solid gray' : 'none'}"
+    )
+    q-expansion-item.list-item__accordion(
+      dense
+      style="width: 200%"
+      :hide-expand-icon="!item.explanation"
+      expand-icon-toggle
+      expand-separator
+      :caption="item.translation"
+      :label="`${item.term}`"
+      )
+      q-card(v-if="item.explanation")
+        q-card-section.item-description {{ item.explanation }}
+
+    q-menu(
+      auto-close
+      anchor="center middle"
+      self="center middle"
+      )
+      q-list(style="min-width: 100px")
+        q-item(clickable v-close-popup @click="removeTerm(item.id, index)")
+          q-item-section.text-capitalize {{ $t('delete') }}
+        q-item(clickable v-close-popup @click="openEditTerm(item.term)")
+          q-item-section.text-capitalize {{ $t('edit') }}
+        q-item(v-if="!item.training" clickable v-close-popup @click="addToTraining(item, index)")
+          q-item-section.text-capitalize {{ $t('add to training') }}
+q-footer
   q-btn(
+    style={width: "100%"}
     @click="drawersStore.setIsAddTermOpen(true)"
     square
-    dense
-    color="primary"
-    icon="add"
-  )
-q-scroll-area(v-if="itemsRef?.value" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
-  q-item.q-px-none(v-for="(item, index) in itemsRef.value" :key="item.id")
-    q-item-section
-      q-item-label {{ item.term }} - {{ item.translation }}
-      q-item-label(caption) {{ item?.explanation }}
-    q-item-section(side top)
-      q-btn(flat dense round color="blue-grey" icon="more_vert")
-      q-menu(auto-close anchor="center middle" self="bottom right")
-        q-list(style="min-width: 100px")
-          q-item(clickable v-close-popup @click="removeTerm(item.id, index)")
-            q-item-section Delete
-          q-item(clickable v-close-popup @click="openEditTerm(item.term)")
-            q-item-section Edit
-          q-item(v-if="!item.training" clickable v-close-popup @click="addToTraining(item, index)")
-            q-item-section Add to training
+    color="warning"
+    label="add term"
+)
 EditTermDialog(v-if="$route.query.term")
 AddTermDialog
-
 </template>
 
 <script setup>
 import { ref, toRefs, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import useUtils from 'src/composables/useUtils';
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 
@@ -51,7 +68,6 @@ const props = defineProps({
   items: Object,
 });
 const { items: itemsRef } = toRefs(props);
-const { currentPageTitle } = useUtils();
 
 const removeTerm = async (id, index) => {
   itemsRef.value.value.splice(index, 1);
@@ -82,3 +98,25 @@ onMounted(() => {
     document.getElementsByClassName('q-page')[0]?.clientHeight - 140 + 'px';
 });
 </script>
+
+<style lang="scss">
+.list-item {
+  cursor: pointer;
+}
+.list-item__accordion {
+  & .q-item__label {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  & .q-item__label--caption {
+    font-size: 14px;
+    font-weight: normal;
+    color: $positive;
+    // color: green;
+  }
+  & .item-description {
+    color: rgba(0, 0, 0, 0.54);
+    font-style: italic;
+  }
+}
+</style>

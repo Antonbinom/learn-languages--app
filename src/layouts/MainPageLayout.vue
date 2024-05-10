@@ -3,7 +3,7 @@ q-layout(view="lHh Lpr lFf")
   HeaderComponent
   LanguagesMenu
   SettingsComponent
-  q-page-container.q-px-md
+  q-page-container
     router-view
 </template>
 

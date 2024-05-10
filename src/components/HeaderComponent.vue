@@ -4,7 +4,13 @@ q-header(elevated)
     LanguageMenuButton(v-if="$route.path === '/'")
     PreviousePageButton(v-else)
     q-toolbar-title.text-center.text-capitalize {{ currentPageTitle }}
-    q-btn(flat @click="toggleSettingsMenu" round dense icon="menu")
+    q-btn(
+      flat
+      @click="toggleSettingsMenu"
+      round
+      dense
+      icon="menu"
+    )
 </template>
 
 <script setup>

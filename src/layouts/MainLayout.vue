@@ -2,7 +2,7 @@
 q-layout(view="lHh Lpr lFf")
   HeaderComponent
   SettingsComponent
-  q-page-container.q-px-md
+  q-page-container
     router-view
   FooterComponent
 </template>

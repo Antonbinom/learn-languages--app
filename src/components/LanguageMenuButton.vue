@@ -1,5 +1,5 @@
 <template lang="pug">
-q-btn(flat @click="openLanguagesMenu" round dense )
+q-btn(flat @click="openLanguagesMenu" round dense)
   q-avatar
     img(:src="languageImage(languagesStore?.currentLanguage)")
 q-toolbar-title.text-capitalize {{ $t(languagesStore.currentLanguage) }}

@@ -1,12 +1,12 @@
 <template lang="pug">
-q-footer(elevated)
+q-footer.bg-warning(elevated)
   q-tabs(
     v-model="tab"
     indicator-color="transparent"
     active-color="white"
     outside-arrows
     mobile-arrows
-    class="text-grey-5 shadow-2")
+    class="text-grey-2 shadow-2")
     q-tab(
       v-for="tab in pages()"
       :key="tab.name"

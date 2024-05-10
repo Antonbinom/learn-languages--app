@@ -9,48 +9,53 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/words',
     component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/WordsPage.vue') }],
+  },
+  {
+    path: '/words/vocabulary',
+    component: () => import('layouts/NoFooterLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/WordsPage.vue') },
       {
-        path: 'vocabulary',
+        path: '',
         component: () => import('pages/VocabularyPage.vue'),
       },
+    ],
+  },
+  {
+    path: '/words/sets',
+    component: () => import('layouts/NoFooterLayout.vue'),
+    children: [
       {
-        path: 'sets',
-        component: () => import('pages/WordsSetsPage.vue'),
-        // children: [
-        //   { path: '', component: () => import('pages/WordsSetsPage.vue') },
-        //   {
-        //     path: 'create',
-        //     component: () => import('pages/CreateWordsSetPage.vue'),
-        //   },
-        // ],
+        path: '',
+        component: () => import('pages/WordsSets/WordsSetsPage.vue'),
       },
-      // { path: 'sets/:name', component: () => import('pages/WordsSetPage.vue') },
     ],
   },
   {
     path: '/words/sets/create',
     component: () => import('layouts/NoFooterLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/CreateWordsSetPage.vue') },
+      {
+        path: '',
+        component: () => import('pages/WordsSets/CreateWordsSetPage.vue'),
+      },
     ],
   },
   {
     path: '/words/sets/:name',
     component: () => import('layouts/NoFooterLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/WordsSetPage.vue') },
+      { path: '', component: () => import('pages/WordsSets/WordsSetPage.vue') },
       // { path: 'edit', component: () => import('pages/EditWordsSetPage.vue') },
     ],
   },
   {
     path: '/words/sets/edit/:name',
-    component: () => import('layouts/NoFooterLayout.vue'),
+    component: () => import('layouts/EmptyLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/EditWordsSetPage.vue'),
+        component: () => import('pages/WordsSets/EditWordsSetPage.vue'),
       },
     ],
   },
