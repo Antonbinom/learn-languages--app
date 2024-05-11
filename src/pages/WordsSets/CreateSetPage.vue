@@ -1,16 +1,16 @@
 <template lang="pug">
 q-page
   div(v-if="filteredTerms")
-    q-input.q-pt-md(
+    q-input.q-pt-md.q-px-md(
       borderless
       v-model="setName"
       :placeholder="$t('set name')"
       maxlength="20"
       )
-    SearchComponent.q-pb-md
-    .text-h6.bg-grey-3 Add words
-    q-scroll-area.q-pr-sm.q-py-md(v-if="filteredTerms" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
-      q-item.q-px-none(
+    SearchComponent.q-pb-md.q-px-md
+    .text-h6.bg-grey-3.q-px-md Add words
+    q-scroll-area.q-py-md(v-if="filteredTerms" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+      q-item(
         v-for="(item, index) in filteredTerms"
         :key="item.id"
         :style="(filteredTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
@@ -27,9 +27,9 @@ q-page
           color="positive"
           icon="add"
         )
-    .text-h6.bg-grey-3 Added words
-    q-scroll-area.q-pr-sm.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
-      q-item.q-px-none(
+    .text-h6.bg-grey-3.q-px-md Added words
+    q-scroll-area.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+      q-item(
         v-for="(item, index) in addedTerms"
         :key="item.id"
         :style="(addedTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
@@ -46,12 +46,12 @@ q-page
           color="negative"
           icon="remove"
         )
-    q-btn.q-mt-md(
-      :disabled="!(setName && addedTerms.length)"
-      color="positive"
+  q-footer
+    q-btn.q-py-sm(
+      color="warning"
       :label="$t('create new set')"
       style="width: 100%"
-      @click="createSet"
+      @click="(setName && addedTerms.length) && createSet()"
     )
 </template>
 
@@ -99,7 +99,7 @@ const removeTerm = (id) => {
 const createSet = async () => {
   if (!setName.value || !addedTerms.value) return;
   const termsIds = addedTerms.value.map((term) => term.id);
-  await createWordsSet(setName.value.toLowerCase(), termsIds);
+  await createWordsSet(setName.value, termsIds);
   router.push('/words/sets');
 };
 

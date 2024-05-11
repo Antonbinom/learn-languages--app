@@ -8,8 +8,8 @@ export const useDrawersStore = defineStore('drawers', () => {
   const isAddTermOpen = ref(false);
   const isEditTermOpen = ref(false);
 
-  const setIsSettingsMenuOpen = () => {
-    isSettingsOpen.value = !isSettingsOpen.value;
+  const setIsSettingsMenuOpen = (value: boolean) => {
+    isSettingsOpen.value = value;
   };
 
   const setIsLangugesMenuOpen = (state: boolean) => {

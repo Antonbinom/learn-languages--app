@@ -6,27 +6,26 @@ q-page.q-pt-md
     :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }"
     :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }"
     )
-    q-item.list-item(
+    q-slide-item(
+      right-color="negative"
+      @right="removeWordsSet(item.name)"
       v-for="(item) in wordsSets"
-      :key="item.id"
-      :style="{'border-bottom': '1px solid gray', 'cursor': 'pointer'}"
-      )
-      q-item-section(@click="$router.push(`/words/sets/${item.name}`)")
-        q-item-label.list-item__name {{ item.name}}
-      q-item-section(side top)
-        q-icon(  color="blue-grey" name="more_vert")
-        q-menu(auto-close anchor="center middle" self="bottom right")
-          q-list(style="min-width: 100px")
-            q-item(clickable v-close-popup @click="removeWordsSet(item.name)")
-              q-item-section.text-capitalize {{ $t('delete') }}
-            q-item(clickable v-close-popup @click="$router.push(`/words/sets/edit/${item.name}`)")
-              q-item-section.text-capitalize {{ $t('edit') }}
+      :key="item.id")
+      template(v-slot:right)
+        .row.items-center
+          .text-capitalize {{$t('delete')}}
+          q-icon(name="delete")
+      q-item.list-item(
+        :style="{'border-bottom': '1px solid gray', 'cursor': 'pointer'}"
+        )
+        q-item-section(@click="$router.push(`/words/sets/${item.name}`)")
+          q-item-label.list-item__name {{ item.name}}
   q-footer
     router-link(to="/words/sets/create")
       q-btn.absolute-bottom(
         square
         color="warning"
-        label="add new words set"
+        :label="$t('add new words set')"
         style={width: "100%"}
       )
 </template>
@@ -39,13 +38,12 @@ import { useWordsSets } from 'src/composables/useWordsSets';
 
 const { getAllWordsSets, removeWordsSet } = useWordsSets();
 
-const wordsSets = ref([{ name: 'Animals' }, { name: 'Flowers' }]);
-
 const scrollAreaHeight = ref();
-
+const wordsSets = ref([]);
 $on('request-words-sets', async () => {
   wordsSets.value = await getAllWordsSets();
 });
+
 onMounted(async () => {
   wordsSets.value = await getAllWordsSets();
   scrollAreaHeight.value =

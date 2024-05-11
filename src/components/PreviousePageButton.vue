@@ -1,5 +1,6 @@
 <template lang="pug">
 q-btn(
+  color="dark"
   dense
   round
   flat

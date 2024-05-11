@@ -1,15 +1,16 @@
 <template lang="pug">
-q-header(elevated)
+q-header.bg-white(elevated)
   q-toolbar
     LanguageMenuButton(v-if="$route.path === '/'")
     PreviousePageButton(v-else)
-    q-toolbar-title.text-center.text-capitalize {{ currentPageTitle }}
+    q-toolbar-title.text-center.text-capitalize.text-dark {{ currentPageTitle }}
     q-btn(
       flat
       @click="toggleSettingsMenu"
       round
       dense
       icon="menu"
+      color="dark"
     )
 </template>
 
@@ -25,6 +26,6 @@ const drawersStore = useDrawersStore();
 const { currentPageTitle } = useUtils();
 
 const toggleSettingsMenu = () => {
-  drawersStore.setIsSettingsMenuOpen();
+  drawersStore.setIsSettingsMenuOpen(!drawersStore.isSettingsOpen);
 };
 </script>

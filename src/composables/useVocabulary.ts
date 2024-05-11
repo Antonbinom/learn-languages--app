@@ -32,8 +32,8 @@ export const useVocabulary = () => {
     const searchLower = searchTerm.toLowerCase();
     return terms.filter(
       (item) =>
-        item.term.includes(searchLower) ||
-        item.translation.includes(searchLower)
+        item.term.toLowerCase().includes(searchLower) ||
+        item.translation.toLowerCase().includes(searchLower)
     );
   };
 

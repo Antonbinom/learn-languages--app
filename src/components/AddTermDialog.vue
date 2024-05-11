@@ -25,8 +25,8 @@ q-dialog(
         )
     q-footer
       q-btn-group(spread)
-        q-btn(color="warning" label="Back" @click="drawersStore.setIsAddTermOpen(false)")
-        q-btn(color="promary" label="Add term" @click="addTerm" :disabled="!isInputsValid")
+        q-btn(color="warning" :label="$t('back')" @click="drawersStore.setIsAddTermOpen(false)")
+        q-btn(color="teal" :label="$t('save')" @click="addTerm" :disabled="!isInputsValid")
 </template>
 
 <script setup>

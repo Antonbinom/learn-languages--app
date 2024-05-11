@@ -2,7 +2,7 @@
 q-btn(flat @click="openLanguagesMenu" round dense)
   q-avatar
     img(:src="languageImage(languagesStore?.currentLanguage)")
-q-toolbar-title.text-capitalize {{ $t(languagesStore.currentLanguage) }}
+q-toolbar-title.text-capitalize.text-dark {{ $t(languagesStore.currentLanguage) }}
 </template>
 
 <script setup>

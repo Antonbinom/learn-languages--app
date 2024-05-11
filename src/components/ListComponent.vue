@@ -4,43 +4,43 @@ q-scroll-area.q-mt-md(
   :style="{height:  scrollAreaHeight}"
   :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }"
   :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
-  q-item.q-px-none.list-item(
-    v-close-popup
+  q-slide-item(
     v-for="(item, index) in itemsRef.value"
+    @right="removeTerm(item.id, index)"
+    @left="openEditTerm($event, item.term)"
     :key="item.id"
-    :style="{'border-bottom': (itemsRef?.value.length-1 !== index) ? '1px solid gray' : 'none'}"
+    right-color="negative"
+    left-color="positive"
     )
-    q-expansion-item.list-item__accordion(
-      dense
-      style="width: 200%"
-      :hide-expand-icon="!item.explanation"
-      expand-icon-toggle
-      expand-separator
-      :caption="item.translation"
-      :label="`${item.term}`"
+    template(v-slot:right)
+      .row.items-center
+        .text-capitalize {{$t('delete')}}
+        q-icon(name="delete")
+    template(v-slot:left)
+      .row.items-center
+        .text-capitalize {{$t('edit')}}
+        q-icon(name="edit")
+    q-item.q-px-none.list-item(
+      :style="{'border-bottom': (itemsRef?.value.length-1 !== index) ? '1px solid gray' : 'none'}"
       )
-      q-card(v-if="item.explanation")
-        q-card-section.item-description {{ item.explanation }}
-
-    q-menu(
-      auto-close
-      anchor="center middle"
-      self="center middle"
-      )
-      q-list(style="min-width: 100px")
-        q-item(clickable v-close-popup @click="removeTerm(item.id, index)")
-          q-item-section.text-capitalize {{ $t('delete') }}
-        q-item(clickable v-close-popup @click="openEditTerm(item.term)")
-          q-item-section.text-capitalize {{ $t('edit') }}
-        q-item(v-if="!item.training" clickable v-close-popup @click="addToTraining(item, index)")
-          q-item-section.text-capitalize {{ $t('add to training') }}
+      q-expansion-item.list-item__accordion(
+        dense
+        style="width: 200%"
+        :hide-expand-icon="!item.explanation"
+        expand-icon-toggle
+        expand-separator
+        :caption="item.translation"
+        :label="`${item.term}`"
+        )
+        q-card(v-if="item.explanation")
+          q-card-section.item-description {{ item.explanation }}
 q-footer
   q-btn(
     style={width: "100%"}
     @click="drawersStore.setIsAddTermOpen(true)"
     square
     color="warning"
-    label="add term"
+    :label="$t('add term')"
 )
 EditTermDialog(v-if="$route.query.term")
 AddTermDialog
@@ -62,8 +62,8 @@ const drawersStore = useDrawersStore();
 
 const route = useRoute();
 const router = useRouter();
-const { removeVocabularyTerm, editVocabularyTerm } = useVocabulary();
-const { removePhrasalVerb, editPhrasalVerb } = usePhrasalVerbs();
+const { removeVocabularyTerm } = useVocabulary();
+const { removePhrasalVerb } = usePhrasalVerbs();
 const props = defineProps({
   items: Object,
 });
@@ -78,17 +78,19 @@ const removeTerm = async (id, index) => {
   }
 };
 
-const addToTraining = (item) => {
-  if (route.path === '/words/vocabulary') {
-    editVocabularyTerm(item.id, { ...item, training: !item.training });
-  } else if (route.path === '/phrasal-verbs') {
-    editPhrasalVerb(item.id, { ...item, training: !item.training });
-  }
-};
+// const addToTraining = ({ reset }, item) => {
+//   if (route.path === '/words/vocabulary') {
+//     editVocabularyTerm(item.id, { ...item, training: !item.training });
+//   } else if (route.path === '/phrasal-verbs') {
+//     editPhrasalVerb(item.id, { ...item, training: !item.training });
+//   }
+//   reset();
+// };
 
-const openEditTerm = (term) => {
+const openEditTerm = ({ reset }, term) => {
   drawersStore.setIsEditTermOpen(true);
   router.push({ query: { term: term.toLowerCase() } });
+  reset();
 };
 
 const scrollAreaHeight = ref();

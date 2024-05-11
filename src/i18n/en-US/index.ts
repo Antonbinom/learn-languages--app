@@ -25,4 +25,9 @@ export default {
   'create new set': 'create new set',
   'save and exit': 'save and exit',
   'add to training': 'add to training',
+  'add new words set': 'add new words set',
+  'add term': 'add term',
+  'edit term': 'edit term',
+  'add words to set': 'add words to set',
+  'remove words from set': 'remove words from set',
 };

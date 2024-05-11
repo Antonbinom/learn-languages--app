@@ -9,7 +9,9 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/words',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/WordsPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/Words/IndexPage.vue') },
+    ],
   },
   {
     path: '/words/vocabulary',
@@ -17,7 +19,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/VocabularyPage.vue'),
+        component: () => import('pages/Words/VocabularyPage.vue'),
       },
     ],
   },
@@ -27,7 +29,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/WordsSetsPage.vue'),
+        component: () => import('pages/WordsSets/IndexPage.vue'),
       },
     ],
   },
@@ -37,15 +39,18 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/CreateWordsSetPage.vue'),
+        component: () => import('pages/WordsSets/CreateSetPage.vue'),
       },
     ],
   },
   {
     path: '/words/sets/:name',
-    component: () => import('layouts/NoFooterLayout.vue'),
+    component: () => import('layouts/EmptyLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/WordsSets/WordsSetPage.vue') },
+      {
+        path: '',
+        component: () => import('pages/WordsSets/SetPage.vue'),
+      },
       // { path: 'edit', component: () => import('pages/EditWordsSetPage.vue') },
     ],
   },
@@ -55,7 +60,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/EditWordsSetPage.vue'),
+        component: () => import('pages/WordsSets/EditSetPage.vue'),
       },
     ],
   },
@@ -63,27 +68,29 @@ const routes: RouteRecordRaw[] = [
     path: '/phrasal-verbs',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/PhrasalVerbsPage.vue') },
+      { path: '', component: () => import('pages/PhrasalVerbs/IndexPage.vue') },
     ],
   },
   {
     path: '/sentences',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/SentencesPage.vue') },
+      { path: '', component: () => import('pages/Sentences/IndexPage.vue') },
     ],
   },
   {
     path: '/grammar-rules',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/GrammarRulesPage.vue') },
+      { path: '', component: () => import('pages/GrammarRules/IndexPage.vue') },
     ],
   },
   {
     path: '/books',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/BooksPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/Books/IndexPage.vue') },
+    ],
   },
   // Always leave this as last one,
   // but you can also remove it

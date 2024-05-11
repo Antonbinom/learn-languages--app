@@ -3,7 +3,7 @@ q-drawer(
   side="right"
   :model-value="isSettingsOpen"
   bordered
-  @hide="drawersStore.setIsSettingsMenuOpen()"
+  @hide="drawersStore.setIsSettingsMenuOpen(false)"
   )
   q-list
     q-item-label(header) Essential Links

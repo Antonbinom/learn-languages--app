@@ -11,7 +11,7 @@ q-footer.bg-warning(elevated)
       v-for="tab in pages()"
       :key="tab.name"
       :name="tab.name"
-      :label="tab.label"
+      :label="$t(tab.label.toLowerCase())"
       @click="$router.push(tab.path)"
       )
 </template>

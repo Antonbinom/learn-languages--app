@@ -7,7 +7,7 @@ q-dialog(
   :model-value="isEditTermOpen"
   )
   q-card(class="bg-white text-white")
-    q-toolbar(class="bg-primary text-white text-center")
+    q-toolbar(class="text-dark text-center")
       q-toolbar-title Edit {{ $t(currentPageTitle) }}
     q-card-section(dense)
      .text-h6.text-dark Term
@@ -25,8 +25,8 @@ q-dialog(
         )
     q-footer
       q-btn-group(spread)
-        q-btn(color="warning" label="Back" @click="closePopup")
-        q-btn(color="positive" label="Edit term"  @click="editTerm" :disabled="!isInputsValid")
+        q-btn(color="warning" :label="$t('back')" @click="closePopup")
+        q-btn(color="teal" :label="$t('edit term')"  @click="editTerm" :disabled="!isInputsValid")
 </template>
 
 <script setup>
@@ -92,6 +92,7 @@ const closePopup = () => {
 onMounted(async () => {
   if (route.path === '/words/vocabulary') {
     item.value = await getVocabularyTerm(route.query.term);
+    console.log(await getVocabularyTerm(route.query.term));
   } else if (route.path === '/phrasal-verbs') {
     item.value = await getPhrasalVerb(route.query.term);
   }
