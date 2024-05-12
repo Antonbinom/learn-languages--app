@@ -24,8 +24,11 @@ export const useVocabulary = () => {
 
   const getAllVocabularies = () => liveQuery(() => db.vocabularies.toArray());
 
-  const getVocabulary = () => {
-    return db.vocabularies.where('lang').equals(currentLanguage.value).first();
+  const getVocabulary = async () => {
+    return await db.vocabularies
+      .where('lang')
+      .equals(currentLanguage.value)
+      .first();
   };
 
   const getFilteredTerms = (terms: Term[], searchTerm: string) => {
@@ -63,10 +66,7 @@ export const useVocabulary = () => {
   };
 
   const getVocabularyTerm = async (name: string) => {
-    const vocabulary = await db.vocabularies
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
+    const vocabulary = await getVocabulary();
 
     return vocabulary?.terms.find(
       (term) => term.id === `${name}-${currentLanguage.value}`
@@ -112,6 +112,7 @@ export const useVocabulary = () => {
     createVocabulary,
     getAllVocabularies,
     getVocabularyTerms,
+    getVocabulary,
     addNewVocabularyTerm,
     removeVocabularyTerm,
     editVocabularyTerm,

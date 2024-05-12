@@ -86,6 +86,27 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/trainings',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Trainings/IndexPage.vue') },
+      {
+        path: 'words',
+        component: () => import('pages/Trainings/Words/IndexPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/words/sprint',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/Words/SprintPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/books',
     component: () => import('layouts/MainLayout.vue'),
     children: [

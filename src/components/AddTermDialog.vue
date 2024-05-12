@@ -52,7 +52,7 @@ const item = ref({
   term: '',
   translation: '',
   explanation: '',
-  training: false,
+  training: true,
 });
 
 const isAddTermOpen = computed(() => {
@@ -80,7 +80,7 @@ const addTerm = () => {
     term: '',
     translation: '',
     explanation: '',
-    training: false,
+    training: true,
   };
 };
 </script>

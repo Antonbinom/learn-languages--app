@@ -37,6 +37,11 @@ export const pages = () => {
           path: '/words/trainings',
         },
         {
+          name: 'word training',
+          label: 'Words',
+          path: '/trainings/words',
+        },
+        {
           name: 'create set',
           label: 'Create set',
           path: '/words/sets/create',
@@ -62,6 +67,18 @@ export const pages = () => {
       name: 'grammar',
       label: 'Grammar',
       path: '/grammar-rules',
+    },
+    {
+      name: 'trainings',
+      label: 'Trainings',
+      path: '/trainings',
+      children: [
+        {
+          name: 'words',
+          label: 'Words',
+          path: '/trainings/words',
+        },
+      ],
     },
     {
       name: 'books',

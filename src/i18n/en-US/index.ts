@@ -30,4 +30,10 @@ export default {
   'edit term': 'edit term',
   'add words to set': 'add words to set',
   'remove words from set': 'remove words from set',
+  yes: 'yes',
+  no: 'no',
+  sprint: 'sprint',
+  spelling: 'spelling',
+  'term-translation': 'term-translation',
+  repeat: 'repeat',
 };
