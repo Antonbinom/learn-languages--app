@@ -9,75 +9,41 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
     @click="toPreviousePage"
     class="absolute-top-right q-ma-md"
     )
-  .q-px-md(v-if="isTraining")
-    q-knob(
-      reverse
-      v-model="countdown"
-      show-value
-      readonly
-      :min="0"
-      :max="6000"
-      size="150px"
-      :thickness="0.05"
-      color="teal"
-      center-color="white"
-      track-color="grey"
-      class="q-my-xl"
+  div(style="paddingTop: 60px")
+    PrestartingComponent(
+      v-if="isPresettings"
+      :prestartingCountdown="prestartingCountdown"
+      :runPrestartingCountdown="runPrestartingCountdown"
       )
-      span {{ Math.ceil(countdown/100) }}
-    .text-h5.text-bold.q-mb-lg {{ `${trainingMode === 'English - Russian' ? questionTerm?.term : questionTerm?.translation}` }}
-    .text-h6 {{ `${trainingMode !== 'English - Russian' ? translationTerm?.term : translationTerm?.translation}` }}
-  .q-px-md(v-if="isPresettings")
-    q-knob.cursor-pointer(
-      v-model="prestartingCountdown"
-      show-value
-      readonly
-      size="150px"
-      :thickness="0.02"
-      color="teal"
-      center-color="white"
-      track-color="teal"
-      class="q-my-xl"
-      @click="runPrestartingCountdown()"
-      )
-      span {{ `${prestartingCountdown>0 ? prestartingCountdown : 'Start'}` }}
-  .q-px-md(v-if="isResults")
-    q-knob(
-      v-model="results.percents"
-      show-value
-      readonly
-      min="0"
-      max="100"
-      size="150px"
-      :thickness="0.05"
-      :color="(results.percents < 25 && 'red')|| (results.percents < 50 && 'red-4') || (results.percents < 75 && 'warning') ||'teal'"
-      center-color="white"
-      track-color="grey"
-      class="q-my-xl"
-      )
-      span {{ results.percents }}%
-    .text-h5 {{$t('correct answers')}}: {{ results.correctAnswers }}
-    .text-h5 {{$t('wrong answers')}}: {{ results.wrongAnswers }}
-
-  q-btn-group.q-gutter-xl.q-pb-xl.absolute-bottom.q-px-md(spread flat)
-    q-btn(v-if="isTraining" color="warning" :label="$t('no')" @click="setAnswer(false)")
-    q-btn(v-if="isTraining" color="teal" :label="$t('yes')" @click="setAnswer(true)")
-    q-btn(v-if="isResults" color="warning" :label="$t('back')" @click="resetTraining()")
-    q-btn(v-if="isResults" color="teal" :label="$t('try again')" @click="runPrestartingCountdown()")
-
-  q-toggle(
-    v-if="isPresettings"
-    :label="trainingMode"
-    color="teal"
-    :false-value="`${currentLanguage} - russian`"
-    :true-value="`russian - ${currentLanguage}`"
-    v-model="trainingMode"
+    ModeTogglerComponent(
+      v-if="isPresettings && !isCountdownRuns"
+      :currentLanguage="currentLanguage"
+      :trainingMode="trainingMode"
+      @toggleTrainingMode="trainingMode = $event"
     )
-
+    SprintComponent(
+      v-if="isTraining"
+      :countdown="countdown"
+      :trainingMode="trainingMode"
+      :questionTerm="questionTerm"
+      :translationTerm="translationTerm"
+      :setAnswer="setAnswer")
+    ResultsComponent(
+      v-if="isResults"
+      :results="results"
+      :resetTraining="resetTraining"
+      :runPrestartingCountdown="runPrestartingCountdown"
+    )
 </template>
 
 <script setup>
 import { computed, onMounted, ref, reactive } from 'vue';
+//Components
+import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
+import ModeTogglerComponent from 'src/components/Trainings/ModeTogglerComponent.vue';
+import SprintComponent from 'src/components/Trainings/SprintComponent.vue';
+import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
+
 import { useVocabulary } from 'src/composables/useVocabulary';
 import useUtils from 'src/composables/useUtils';
 //Stores
@@ -91,12 +57,13 @@ const { toPreviousePage } = useUtils();
 const isPresettings = ref(true);
 const isTraining = ref(false);
 const isResults = ref(false);
-
-const prestartingCountdown = ref(0);
+const isCountdownRuns = ref(false);
+const status = ref('neutral');
 
 const countdown = ref(6000);
-const status = ref('neutral');
+const prestartingCountdown = ref(0);
 const trainingMode = ref(`${currentLanguage} - russian`);
+
 const terms = ref([]);
 const passedTerms = ref([]);
 const notPassedTerms = ref([]);
@@ -164,35 +131,55 @@ const setAnswer = (value) => {
       setQuestionTerm();
       setTranslationTerm();
     }
-  }, 150);
+  }, 200);
 };
 
+function startTraining() {
+  isPresettings.value = false;
+  isTraining.value = true;
+  isResults.value = false;
+}
+
 function stopTraining() {
+  isCountdownRuns.value = false;
   isTraining.value = false;
   isResults.value = true;
   status.value = 'neutral';
-  const totalQuestions = results.correctAnswers + results.wrongAnswers;
-  const correctAnswers = results.correctAnswers;
 
-  const percentageCorrect = (correctAnswers / totalQuestions) * 100;
-  results.percents = percentageCorrect.toFixed(0);
+  clearInterval(trainingCountdownInterval);
+
+  const totalQuestions = results.correctAnswers + results.wrongAnswers;
+
+  if (totalQuestions) {
+    results.percents =
+      ((results.correctAnswers / totalQuestions) * 100).toFixed(0) || 0;
+  }
 }
 
 function resetTraining() {
+  isCountdownRuns.value = false;
+  isPresettings.value = true;
   isTraining.value = false;
   isResults.value = false;
-  isPresettings.value = true;
+  countdown.value = 6000;
+  notPassedTerms.value = JSON.parse(JSON.stringify(terms.value));
+  passedTerms.value = [];
+  results.correctAnswers = 0;
+  results.wrongAnswers = 0;
+  results.percents = 0;
+  prestartingCountdown.value = 0;
 }
 
 const runPrestartingCountdown = () => {
+  resetTraining();
+  isCountdownRuns.value = true;
   prestartingCountdown.value = 3;
   const countdownInterval = setInterval(() => {
     if (prestartingCountdown.value > 1) {
-      prestartingCountdown.value = prestartingCountdown.value - 1;
+      prestartingCountdown.value--;
     } else {
       clearInterval(countdownInterval);
-      isTraining.value = true;
-      isPresettings.value = false;
+      startTraining();
       runTrainingCountdown();
     }
   }, 1000);
@@ -203,7 +190,7 @@ let trainingCountdownInterval;
 const runTrainingCountdown = () => {
   trainingCountdownInterval = setInterval(() => {
     if (countdown.value > 1) {
-      countdown.value = countdown.value - 1;
+      countdown.value--;
     } else {
       clearInterval(trainingCountdownInterval);
       stopTraining();
