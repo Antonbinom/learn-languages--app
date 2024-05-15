@@ -12,12 +12,8 @@ const links = [
     path: '/words/vocabulary',
   },
   {
-    name: 'spelling',
+    name: 'sets',
     path: '/words/sets',
-  },
-  {
-    name: 'collections',
-    path: '/words/collections',
   },
   {
     name: 'trainings',

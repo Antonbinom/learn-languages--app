@@ -43,9 +43,6 @@ export const useWordsSets = () => {
 
   const removeWordsSet = async (name: string) => {
     if (!(await getWordsSet(name))) {
-      console.log(
-        `${currentLanguage.value} set with name ${name} does not exist`
-      );
     } else {
       await db.wordsSets
         .where('lang')

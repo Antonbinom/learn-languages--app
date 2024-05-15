@@ -8,17 +8,17 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       :startTraining="startTraining"
       :isCountdownRuns="isCountdownRuns"
       )
+
     ModeTogglerComponent(
       v-if="isPresettings && !isCountdownRuns"
       :currentLanguage="currentLanguage"
       :trainingMode="trainingMode"
       @toggleTrainingMode="trainingMode = $event"
     )
-    SprintComponent(
+    RepeatComponent(
       v-if="isTraining"
       :trainingMode="trainingMode"
       :questionTerm="questionTerm"
-      :translationTerm="translationTerm"
       :setAnswer="setAnswer"
       @onStopTraining="stopTraining"
       )
@@ -34,7 +34,7 @@ import { computed, onMounted, ref, reactive } from 'vue';
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
 import ModeTogglerComponent from 'src/components/Trainings/ModeTogglerComponent.vue';
-import SprintComponent from 'src/components/Trainings/SprintComponent.vue';
+import RepeatComponent from 'src/components/Trainings/RepeatComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
 
@@ -43,6 +43,7 @@ import { useVocabulary } from 'src/composables/useVocabulary';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const { currentLanguage } = useLanguagesStore();
+
 const { getVocabulary } = useVocabulary();
 
 const isPresettings = ref(true);
@@ -57,8 +58,8 @@ const terms = ref([]);
 const passedTerms = ref([]);
 const notPassedTerms = ref([]);
 const questionTerm = ref({});
-const translationTerm = ref({});
 const results = reactive({
+  unknown: [],
   correctAnswers: 0,
   wrongAnswers: 0,
   percents: 0,
@@ -83,34 +84,20 @@ const setQuestionTerm = () => {
   questionTerm.value = notPassedTerms.value[randomIndex];
 };
 
-const setTranslationTerm = () => {
-  const filteredTerms = terms.value.filter(
-    (item) => item.id !== questionTerm.value.id
-  );
-  const randomIndex = Math.floor(Math.random() * filteredTerms.length);
-  const randomTranslationsIndex = Math.random() >= 0.5 ? 1 : 0;
-
-  translationTerm.value = [questionTerm.value, terms.value[randomIndex]][
-    randomTranslationsIndex
-  ];
-};
-
 const setAnswer = (value) => {
-  const isTermsEqual = questionTerm.value.term === translationTerm.value.term;
-  if (isTermsEqual && value) {
-    moveTermToPassedTerms();
+  if (value) {
     status.value = 'correct';
     results.correctAnswers++;
-  } else if (!isTermsEqual && !value) {
-    status.value = 'correct';
-    results.correctAnswers++;
-  } else if (isTermsEqual && !value) {
-    status.value = 'wrong';
-    results.wrongAnswers++;
   } else {
     status.value = 'wrong';
     results.wrongAnswers++;
+    const unknownTermValue =
+      trainingMode.value === 'english - russian'
+        ? questionTerm.value?.term
+        : questionTerm.value?.translation;
+    results.unknown.push(unknownTermValue);
   }
+  moveTermToPassedTerms();
 
   setTimeout(() => {
     if (!notPassedTerms.value.length) {
@@ -118,7 +105,6 @@ const setAnswer = (value) => {
     } else {
       status.value = 'neutral';
       setQuestionTerm();
-      setTranslationTerm();
     }
   }, 200);
 };
@@ -153,6 +139,7 @@ function resetTraining() {
   results.correctAnswers = 0;
   results.wrongAnswers = 0;
   results.percents = 0;
+  results.unknown = [];
 }
 
 onMounted(async () => {
@@ -160,6 +147,5 @@ onMounted(async () => {
   terms.value = vocabularyTerms.filter((item) => item.training);
   notPassedTerms.value = [...terms.value];
   setQuestionTerm();
-  setTranslationTerm();
 });
 </script>

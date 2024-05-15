@@ -16,8 +16,8 @@ const links = [
     path: '/trainings/words/spelling',
   },
   {
-    name: 'term-translation',
-    path: '/trainings/words/repeat',
+    name: 'quiz',
+    path: '/trainings/words/quiz',
   },
   {
     name: 'repeat',

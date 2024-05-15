@@ -107,6 +107,36 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/trainings/words/spelling',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/Words/SpellingPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/words/quiz',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/Words/TermQuizPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/words/repeat',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/Words/RepeatPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/books',
     component: () => import('layouts/MainLayout.vue'),
     children: [

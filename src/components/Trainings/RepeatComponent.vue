@@ -1,21 +1,21 @@
 <template lang="pug">
 CoundownComponent(:countdown="countdown")
 .text-h5.text-bold.q-mb-lg {{ `${trainingMode === 'english - russian' ? questionTerm?.term : questionTerm?.translation}` }}
-.text-h6 {{ `${trainingMode !== 'english - russian' ? translationTerm?.term : translationTerm?.translation}` }}
+HintComponent(:hint="trainingMode === 'english - russian' ? questionTerm?.translation : questionTerm?.term")
 q-btn-group(spread flat).q-gutter-xl.q-pb-xl.absolute-bottom.q-px-md
-  q-btn(color="warning" :label="$t('no')" @click="setAnswer(false)")
-  q-btn(color="teal" :label="$t('yes')" @click="setAnswer(true)")
+  q-btn(color="warning" :label="$t(`i don't know`)" @click="setAnswer(false)")
+  q-btn(color="teal" :label="$t('i know')" @click="setAnswer(true)")
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 // Components
+import HintComponent from 'src/components/Trainings/HintComponent.vue';
 import CoundownComponent from 'src/components/Trainings/CoundownComponent.vue';
 
 defineProps({
   trainingMode: String,
   questionTerm: Object,
-  translationTerm: Object,
   setAnswer: Function,
 });
 

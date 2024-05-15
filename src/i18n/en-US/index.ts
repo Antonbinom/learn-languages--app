@@ -36,4 +36,13 @@ export default {
   spelling: 'spelling',
   'term-translation': 'term-translation',
   repeat: 'repeat',
+  next: 'next',
+  'try again': 'try again',
+  'wrong answers': 'wrong answers',
+  'correct answers': 'correct answers',
+  'irregular verbs': 'irregular verbs',
+  sets: 'sets',
+  quiz: 'quiz',
+  'click to see hint': 'click to see hint',
+  'unknown terms': 'unknown terms',
 };

@@ -92,7 +92,6 @@ const closePopup = () => {
 onMounted(async () => {
   if (route.path === '/words/vocabulary') {
     item.value = await getVocabularyTerm(route.query.term);
-    console.log(await getVocabularyTerm(route.query.term));
   } else if (route.path === '/phrasal-verbs') {
     item.value = await getPhrasalVerb(route.query.term);
   }

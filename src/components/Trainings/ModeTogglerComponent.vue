@@ -5,18 +5,21 @@ q-toggle(
   :false-value="`${currentLanguage} - russian`"
   :true-value="`russian - ${currentLanguage}`"
   v-model="toggleValue"
+  @update:model-value="toggleTrainMode()"
   )
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-const emit = defineEmits([]);
+const emit = defineEmits(['toggleTrainingMode']);
 const props = defineProps({
   trainingMode: String,
   currentLanguage: String,
 });
 
 const toggleValue = ref(props.trainingMode);
-emit('toggleTrainingMode', toggleValue.value);
+const toggleTrainMode = () => {
+  emit('toggleTrainingMode', toggleValue.value);
+};
 </script>
