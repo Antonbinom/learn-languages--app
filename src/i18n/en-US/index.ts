@@ -45,4 +45,5 @@ export default {
   quiz: 'quiz',
   'click to see hint': 'click to see hint',
   'unknown terms': 'unknown terms',
+  'There is nothing': 'There is nothing',
 };

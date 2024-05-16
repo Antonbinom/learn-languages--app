@@ -1,10 +1,35 @@
 <template lang="pug">
 q-page.q-px-md
   .q-py-md.q-gutter-sm.column
-    router-link(to="/words/vocabulary")
-      q-btn(color="white" text-color="dark" style="width: 100%") {{$t('vocabulary')}}
-    router-link(to="/words/sets")
-      q-btn(color="white" text-color="dark" style="width: 100%") {{$t('words sets')}}
-    router-link(to="/words/collections")
-      q-btn(color="white" text-color="dark" style="width: 100%") {{$t('trainings')}}
+    router-link(v-for="link in links" :key="link.name" :to="link.path")
+      q-btn(v-if="link?.show || termsLength" color="white" text-color="dark" style="width: 100%") {{$t(link.name)}}
 </template>
+
+<script setup>
+import { useVocabulary } from 'src/composables/useVocabulary';
+import { ref } from 'vue';
+import { onMounted } from 'vue';
+
+const { getVocabulary } = useVocabulary();
+const termsLength = ref(0);
+const links = [
+  {
+    name: 'vocabulary',
+    path: '/words/vocabulary',
+    show: true,
+  },
+  {
+    name: 'sets',
+    path: '/words/sets',
+  },
+  {
+    name: 'trainings',
+    path: '/trainings/words',
+  },
+];
+
+onMounted(async () => {
+  const { terms } = await getVocabulary();
+  termsLength.value = terms.length;
+});
+</script>

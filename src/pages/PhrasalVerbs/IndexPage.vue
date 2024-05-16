@@ -1,8 +1,11 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md
+  SearchComponent.q-px-md(v-if="currentLanguageWords?.value?.length || languagesStore.searchValue")
+
   ListComponent(
     :items="currentLanguageWords")
+  .q-px-md.absolute-center.full-width.text-center(v-if="!currentLanguageWords?.value?.length")
+    .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
 <script setup>

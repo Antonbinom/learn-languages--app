@@ -124,7 +124,7 @@ function stopTraining() {
 }
 
 function resetTraining() {
-  isCountdownRuns.value = true;
+  isCountdownRuns.value = false;
   isPresettings.value = true;
   isTraining.value = false;
   isResults.value = false;

@@ -16,8 +16,6 @@ q-knob.cursor-pointer(
 
 <script setup>
 import { ref } from 'vue';
-import useAppEventBus from 'src/composables/useAppEventBus';
-const { $on } = useAppEventBus();
 
 const props = defineProps({
   resetTraining: Function,
@@ -40,5 +38,4 @@ const runPrestartingCountdown = () => {
   }, 1000);
   prestartingCountdown.value = 3;
 };
-$on('run-prestarting-countdown', runPrestartingCountdown);
 </script>

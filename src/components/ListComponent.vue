@@ -1,9 +1,5 @@
 <template lang="pug">
-q-scroll-area.q-mt-md(
-  v-if="itemsRef?.value"
-  :style="{height:  scrollAreaHeight}"
-  :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }"
-  :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+ResponsiveScrollArea(v-if="itemsRef?.value" :height="scrollAreaHeight")
   q-slide-item(
     v-for="(item, index) in itemsRef.value"
     @right="removeTerm(item.id, index)"
@@ -35,8 +31,7 @@ q-scroll-area.q-mt-md(
         q-card(v-if="item.explanation")
           q-card-section.item-description {{ item.explanation }}
 q-footer
-  q-btn(
-    style={width: "100%"}
+  q-btn.full-width(
     @click="drawersStore.setIsAddTermOpen(true)"
     square
     color="warning"
@@ -55,6 +50,7 @@ import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 //Components
 import AddTermDialog from 'src/components/AddTermDialog.vue';
 import EditTermDialog from 'src/components/EditTermDialog.vue';
+import ResponsiveScrollArea from 'src/components/ResponsiveScrollArea.vue';
 //Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
 //

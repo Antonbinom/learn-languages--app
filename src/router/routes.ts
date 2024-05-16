@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/phrasal-verbs',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/NoFooterLayout.vue'),
     children: [
       { path: '', component: () => import('pages/PhrasalVerbs/IndexPage.vue') },
     ],

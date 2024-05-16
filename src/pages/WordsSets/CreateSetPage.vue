@@ -7,9 +7,9 @@ q-page
       :placeholder="$t('set name')"
       maxlength="20"
       )
-    SearchComponent.q-pb-md.q-px-md
-    .text-h6.bg-grey-3.q-px-md Add words
-    q-scroll-area.q-py-md(v-if="filteredTerms" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+    SearchComponent(v-if="filteredTerms?.length").q-pb-md.q-px-md
+    .text-h6.bg-grey-3.q-px-md(v-if="filteredTerms?.length") Add words
+    ResponsiveScrollArea(v-if="filteredTerms?.length" :height="scrollAreaHeight")
       q-item(
         v-for="(item, index) in filteredTerms"
         :key="item.id"
@@ -27,8 +27,8 @@ q-page
           color="positive"
           icon="add"
         )
-    .text-h6.bg-grey-3.q-px-md Added words
-    q-scroll-area.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+    .text-h6.bg-grey-3.q-px-md(v-if="addedTerms.length") Added words
+    ResponsiveScrollArea(v-if="addedTerms?.length" :height="scrollAreaHeight")
       q-item(
         v-for="(item, index) in addedTerms"
         :key="item.id"
@@ -60,9 +60,10 @@ import { ref, onMounted, computed } from 'vue';
 import { db } from 'src/db';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { useWordsSets } from 'src/composables/useWordsSets';
+import { useRouter } from 'vue-router';
 //Components
 import SearchComponent from 'components/SearchComponent.vue';
-import { useRouter } from 'vue-router';
+import ResponsiveScrollArea from 'components/ResponsiveScrollArea.vue';
 
 const languageStore = useLanguagesStore();
 

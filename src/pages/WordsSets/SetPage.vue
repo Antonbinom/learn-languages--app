@@ -2,9 +2,9 @@
 q-page
   q-header(elevated).bg-white.text-center
     q-toolbar
-      q-toolbar-title.text-dark.text-capitalize {{ $t('edit') }} {{ currentPageTitle }}
-  SearchComponent.q-px-md
-  q-scroll-area.q-pr-sm.q-pt-md(:style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+      q-toolbar-title.text-dark.text-capitalize {{ currentPageTitle }}
+  SearchComponent.q-px-md(v-if="filteredTerms?.length || languagesStore.searchValue")
+  ResponsiveScrollArea(v-if="filteredTerms?.length" :height="scrollAreaHeight")
     q-item.q-px-none.list-item(
       v-for="(item) in filteredTerms"
       :key="item.id"
@@ -33,7 +33,8 @@ q-footer
       :label="$t('edit')"
       @click="$router.push(`/words/sets/edit/${$route.params.name}`)"
     )
-
+.q-px-md.absolute-center.full-width.text-center(v-if="!filteredTerms?.length")
+  .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
 <script setup>
@@ -43,9 +44,11 @@ import useUtils from 'src/composables/useUtils';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 //Components
 import SearchComponent from 'components/SearchComponent.vue';
+import ResponsiveScrollArea from 'components/ResponsiveScrollArea.vue';
+
 import { useRoute } from 'vue-router';
 
-const languageStore = useLanguagesStore();
+const languagesStore = useLanguagesStore();
 
 const route = useRoute();
 
@@ -58,19 +61,19 @@ const setTerms = ref([]);
 
 const filteredTerms = computed(() => {
   return setTerms.value
-    ?.filter((item) => item.term.includes(languageStore.searchValue))
+    ?.filter((item) => item.term.includes(languagesStore.searchValue))
     .sort((a, b) => a.term.localeCompare(b.term));
 });
 
 onMounted(async () => {
   const { terms } = await db.vocabularies
     .where('lang')
-    .equals(languageStore.currentLanguage)
+    .equals(languagesStore.currentLanguage)
     .first();
 
   const { terms: setTermsIds, name } = await db.wordsSets
     .where('lang')
-    .equals(languageStore.currentLanguage)
+    .equals(languagesStore.currentLanguage)
     .and((set) => set.name === route.params.name)
     .first();
 

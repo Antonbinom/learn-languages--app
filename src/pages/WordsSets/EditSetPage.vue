@@ -24,8 +24,8 @@ q-page
       style="width: 100%"
       @click="showSetWords = true"
     )
-  SearchComponent.q-pb-md.q-px-md
-  q-scroll-area(v-if="filteredTerms && !showSetWords" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+  SearchComponent.q-pb-md.q-px-md(v-if="(filteredTerms.length && !showSetWords) || (showSetWords && filteredSetTerms.length)")
+  ResponsiveScrollArea(v-if="filteredTerms.length && !showSetWords" :height="scrollAreaHeight")
     q-item.items-center(
       clickable
       @click="addTerm(item.id)"
@@ -41,7 +41,9 @@ q-page
         color="positive"
         name="add"
       )
-  q-scroll-area(v-if="showSetWords" :style="{height:  scrollAreaHeight}" :bar-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.1 }" :thumb-style="{ right: '0px', background: 'blue', width: '2px', opacity: 0.5 }")
+  .q-px-md.absolute-center.full-width.text-center(v-if="!filteredTerms.length && !showSetWords")
+    .text-h5.text-grey {{$t('There is nothing')}}
+  ResponsiveScrollArea(v-if="showSetWords && filteredSetTerms.length" :height="scrollAreaHeight")
     q-item.items-center(
       clickable
       @click="removeTerm(item.id)"
@@ -57,6 +59,8 @@ q-page
         color="negative"
         name="remove"
       )
+  .q-px-md.absolute-center.full-width.text-center(v-if="showSetWords && !filteredSetTerms.length")
+    .text-h5.text-grey {{$t('There is nothing')}}
 q-footer
   q-btn-group(spread)
     q-btn(
@@ -80,6 +84,8 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 import { useWordsSets } from 'src/composables/useWordsSets';
 //Components
 import SearchComponent from 'components/SearchComponent.vue';
+import ResponsiveScrollArea from 'components/ResponsiveScrollArea.vue';
+
 import { useRoute, useRouter } from 'vue-router';
 
 const languageStore = useLanguagesStore();
@@ -128,7 +134,7 @@ const saveSet = async () => {
   if (!setName.value) return;
   const termsIds = setTerms.value.map((term) => term.id);
   await editWordsSet(route.params.name, setName.value, termsIds);
-  await router.push('/words/sets');
+  await router.push(`/words/sets/${route.params.name}`);
 };
 
 onMounted(async () => {

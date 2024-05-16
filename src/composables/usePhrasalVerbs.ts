@@ -31,6 +31,13 @@ export const usePhrasalVerbs = () => {
     );
   };
 
+  const getPhrasalVerbs = async () => {
+    return await db.phrasalVerbs
+      .where('lang')
+      .equals(currentLanguage.value)
+      .first();
+  };
+
   const getPhrasalVerbsCollection = () => {
     const languageName = currentLanguage.value;
 
@@ -111,6 +118,7 @@ export const usePhrasalVerbs = () => {
   return {
     createPhrasalVerbsCollection,
     getPhrasalVerb,
+    getPhrasalVerbs,
     getPhrasalVerbsCollection,
     addNewPhrasalVerb,
     removePhrasalVerb,
