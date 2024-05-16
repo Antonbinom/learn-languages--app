@@ -6,7 +6,7 @@ q-btn(
   color="teal"
   label="x"
   @click="toPreviousePage"
-  class="absolute-top-right q-ma-md"
+  class="absolute-top-left q-ma-md"
   )
 </template>
 

@@ -87,3 +87,48 @@ export const pages = () => {
     },
   ];
 };
+
+// const phrasalVerbs = 'up
+// around
+// away
+// off
+// out
+// over
+// in
+// down
+// into
+// on
+// by
+// along
+// down
+// through
+// to
+
+// be
+// back
+// blow
+// break
+
+// come
+// cut
+// get
+// go
+// hold
+// knock
+// let
+// lie
+// look
+// make
+// move
+// pass
+// pull
+// put
+// run
+// set
+// shut
+// sit
+// stand
+// take
+// turn
+// walk
+// '
