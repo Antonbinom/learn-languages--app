@@ -1,12 +1,11 @@
 <template lang="pug">
-q-btn(flat @click="openLanguagesMenu" round dense)
+q-btn(@click="openLanguagesMenu" round dense flat)
   q-avatar
-    img(:src="languageImage(languagesStore?.currentLanguage)")
-q-toolbar-title.text-capitalize.text-dark {{ $t(languagesStore.currentLanguage) }}
+    img(:src="`/images/${languagesStore?.currentLanguage}.svg`")
+q-toolbar-title.text-capitalize.text-dark {{ $t(languagesStore?.currentLanguage) }}
 </template>
 
 <script setup>
-import useUtils from 'src/composables/useUtils.ts';
 //Store
 import { useDrawersStore } from 'src/stores/drawersStore';
 import { useLanguagesStore } from 'src/stores/languagesStore';
@@ -17,5 +16,4 @@ const languagesStore = useLanguagesStore();
 const openLanguagesMenu = () => {
   drawersStore.setIsLangugesMenuOpen(true);
 };
-const { languageImage } = useUtils();
 </script>

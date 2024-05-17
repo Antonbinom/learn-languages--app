@@ -6,11 +6,6 @@ const useUtils = () => {
   const router = useRouter();
   const route = useRoute();
 
-  const languageImage = (language: string) => {
-    const imagePath = `../assets/images/${language}.svg`;
-    return new URL(imagePath, import.meta.url).href;
-  };
-
   const currentPageTitle = computed(() => {
     const rootPage = pages?.().find((page) => route.path.includes(page.path));
     if (rootPage?.path === route.path) {
@@ -30,7 +25,7 @@ const useUtils = () => {
     }
   };
 
-  return { languageImage, currentPageTitle, toPreviousePage };
+  return { currentPageTitle, toPreviousePage };
 };
 
 export default useUtils;

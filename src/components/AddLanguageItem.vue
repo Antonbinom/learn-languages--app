@@ -6,12 +6,11 @@ q-item(
   )
   q-item-section(avatar)
     q-avatar
-      img(:src="languageImage(language)")
-  q-item-section {{ $t(language) }}
+      img(:src="`/images/${language}.svg`")
+  q-item-section.text-capitalize {{ $t(language) }}
 </template>
 
 <script setup>
-import useUtils from 'src/composables/useUtils.ts';
 import { useVocabulary } from 'src/composables/useVocabulary';
 // Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
@@ -20,8 +19,6 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 const { createVocabulary } = useVocabulary();
 const drawersStore = useDrawersStore();
 const languagesStore = useLanguagesStore();
-
-const { languageImage } = useUtils();
 
 defineProps({
   language: Object,
