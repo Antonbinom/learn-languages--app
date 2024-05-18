@@ -17,8 +17,8 @@ const useUtils = () => {
 
   const toPreviousePage = () => {
     if (route.path.split('/').length === 2) router.push('/');
-    else if (route.path === `/words/sets/edit/${route.params.name}`) {
-      router.push('/words/sets');
+    else if (route.path === `/words/collections/edit/${route.params.name}`) {
+      router.push('/words/collections');
     } else {
       const prevRoutePath = route.path.split('/').slice(0, -1).join('/');
       router.push(prevRoutePath);

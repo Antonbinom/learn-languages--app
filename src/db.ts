@@ -9,12 +9,16 @@ export interface PhrasalVerbs {
   lang: string;
   terms: Term[];
 }
-export interface WordsSets {
+export interface wordsCollections {
   name: string;
   lang: string;
   terms: string[];
 }
-
+export interface PhrasalVerbsCollections {
+  name: string;
+  lang: string;
+  terms: string[];
+}
 interface Term {
   id: string;
   term: string;
@@ -27,14 +31,16 @@ interface Term {
 export class MySubClassedDexie extends Dexie {
   vocabularies!: Table<Vocabulary>;
   phrasalVerbs!: Table<PhrasalVerbs>;
-  wordsSets!: Table<WordsSets>;
+  wordsCollections!: Table<wordsCollections>;
+  phrasalVerbsCollections!: Table<PhrasalVerbsCollections>;
 
   constructor() {
     super('learnLanguagesAppDB');
     this.version(1).stores({
       vocabularies: '++id, lang, terms',
       phrasalVerbs: '++id, lang, terms',
-      wordsSets: '++id, name, lang, terms',
+      wordsCollections: '++id, name, lang, terms',
+      phrasalVerbsCollections: '++id, name, lang, terms',
     });
   }
 }

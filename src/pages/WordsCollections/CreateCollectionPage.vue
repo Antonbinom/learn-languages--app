@@ -3,8 +3,8 @@ q-page
   div(v-if="filteredTerms")
     q-input.q-pt-md.q-px-md(
       borderless
-      v-model="setName"
-      :placeholder="$t('set name')"
+      v-model="collectionName"
+      :placeholder="$t('collection name')"
       maxlength="20"
       )
     SearchComponent(v-if="filteredTerms?.length").q-pb-md.q-px-md
@@ -49,9 +49,9 @@ q-page
   q-footer
     q-btn.q-py-sm(
       color="warning"
-      :label="$t('create new set')"
+      :label="$t('create new collection')"
       style="width: 100%"
-      @click="(setName && addedTerms.length) && createSet()"
+      @click="(collectionName && addedTerms.length) && createCollection()"
     )
 </template>
 
@@ -59,24 +59,26 @@ q-page
 import { ref, onMounted, computed } from 'vue';
 import { db } from 'src/db';
 import { useLanguagesStore } from 'src/stores/languagesStore';
-import { useWordsSets } from 'src/composables/useWordsSets';
+import { useWordsCollections } from 'src/composables/useWordsCollections';
 import { useRouter } from 'vue-router';
 //Components
 import SearchComponent from 'components/SearchComponent.vue';
 import ResponsiveScrollArea from 'components/ResponsiveScrollArea.vue';
 
-const languageStore = useLanguagesStore();
+const languagesStore = useLanguagesStore();
 
-const { createWordsSet } = useWordsSets();
+const { createWordsCollection } = useWordsCollections();
 const router = useRouter();
 const scrollAreaHeight = ref();
-const setName = ref('');
+const collectionName = ref('');
 const vocabularyTerms = ref();
 const addedTerms = ref([]);
 
 const filteredTerms = computed(() => {
   return vocabularyTerms.value
-    ?.filter((item) => item.term.includes(languageStore.searchValue))
+    ?.filter((item) =>
+      item.term.toLowerCase().includes(languagesStore.searchValue.toLowerCase())
+    )
     .sort((a, b) => a.term.localeCompare(b.term));
 });
 
@@ -97,17 +99,17 @@ const removeTerm = (id) => {
   ];
   addedTerms.value.splice(termIndex, 1);
 };
-const createSet = async () => {
-  if (!setName.value || !addedTerms.value) return;
+const createCollection = async () => {
+  if (!collectionName.value || !addedTerms.value) return;
   const termsIds = addedTerms.value.map((term) => term.id);
-  await createWordsSet(setName.value, termsIds);
-  router.push('/words/sets');
+  await createWordsCollection(collectionName.value, termsIds);
+  router.push('/words/collections');
 };
 
 onMounted(async () => {
   const { terms } = await db.vocabularies
     .where('lang')
-    .equals(languageStore.currentLanguage)
+    .equals(languagesStore.currentLanguage)
     .first();
 
   vocabularyTerms.value = terms;

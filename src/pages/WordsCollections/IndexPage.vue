@@ -1,10 +1,10 @@
 <template lang="pug">
 q-page.q-pt-md
-  ResponsiveScrollArea(v-if="wordsSets" :height="scrollAreaHeight")
+  ResponsiveScrollArea(v-if="wordsCollections" :height="scrollAreaHeight")
     q-slide-item(
       right-color="negative"
-      @right="removeWordsSet(item.name)"
-      v-for="(item) in wordsSets"
+      @right="removewordsCollection(item.name)"
+      v-for="(item) in wordsCollections"
       :key="item.id")
       template(v-slot:right)
         .row.items-center
@@ -13,16 +13,16 @@ q-page.q-pt-md
       q-item.list-item(
         :style="{'border-bottom': '1px solid gray', 'cursor': 'pointer'}"
         )
-        q-item-section(@click="$router.push(`/words/sets/${item.name}`)")
+        q-item-section(@click="$router.push(`/words/collections/${item.name}`)")
           q-item-label.list-item__name {{ item.name}}
   q-footer
-    router-link(to="/words/sets/create")
+    router-link(to="/words/collections/create")
       q-btn.absolute-bottom.full-width(
         square
         color="warning"
-        :label="$t('add new words set')"
+        :label="$t('add new words collection')"
       )
-.q-px-md.absolute-center.full-width.text-center(v-if="!wordsSets?.length")
+.q-px-md.absolute-center.full-width.text-center(v-if="!wordsCollections?.length")
   .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
@@ -32,18 +32,18 @@ import ResponsiveScrollArea from 'components/ResponsiveScrollArea.vue';
 
 import useAppEventBus from 'src/composables/useAppEventBus';
 const { $on } = useAppEventBus();
-import { useWordsSets } from 'src/composables/useWordsSets';
+import { useWordsCollections } from 'src/composables/useWordsCollections';
 
-const { getAllWordsSets, removeWordsSet } = useWordsSets();
+const { getAllwordsCollections, removewordsCollection } = useWordsCollections();
 
 const scrollAreaHeight = ref();
-const wordsSets = ref([]);
-$on('request-words-sets', async () => {
-  wordsSets.value = await getAllWordsSets();
+const wordsCollections = ref([]);
+$on('request-words-collections', async () => {
+  wordsCollections.value = await getAllwordsCollections();
 });
 
 onMounted(async () => {
-  wordsSets.value = await getAllWordsSets();
+  wordsCollections.value = await getAllwordsCollections();
   scrollAreaHeight.value =
     document.getElementsByClassName('q-page')[0]?.clientHeight - 80 + 'px';
 });

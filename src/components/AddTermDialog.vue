@@ -41,7 +41,7 @@ import { useDrawersStore } from 'src/stores/drawersStore';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const drawersStore = useDrawersStore();
-const languageStore = useLanguagesStore();
+const languagesStore = useLanguagesStore();
 const { currentPageTitle } = useUtils();
 const { addNewVocabularyTerm } = useVocabulary();
 const { addNewPhrasalVerb } = usePhrasalVerbs();
@@ -63,16 +63,16 @@ const isInputsValid = computed(() => {
   return item.value.term.trim().length && item.value.translation.trim().length;
 });
 
-const addTerm = () => {
+const addTerm = async () => {
   if (!isInputsValid.value) return;
   if (route.path === '/words/vocabulary') {
-    item.value.id = addNewVocabularyTerm({
-      id: `${item.value.term}-${languageStore.currentLanguage}`,
+    item.value.id = await addNewVocabularyTerm({
+      id: `${item.value.term}-${languagesStore.currentLanguage}`,
       ...item.value,
     });
   } else if (route.path === '/phrasal-verbs') {
-    item.value.id = addNewPhrasalVerb({
-      id: `${item.value.term}-${languageStore.currentLanguage}`,
+    item.value.id = await addNewPhrasalVerb({
+      id: `${item.value.term}-${languagesStore.currentLanguage}`,
       ...item.value,
     });
   }

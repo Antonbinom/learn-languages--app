@@ -23,24 +23,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getPhrasalVerbsCollection } = usePhrasalVerbs();
+const { getFilteredPhrasalVerbs } = usePhrasalVerbs();
 
 const { $on } = useAppEventBus();
 
 let currentLanguageWords = ref();
 
 $on('request-phrasal-verbs', () => {
-  currentLanguageWords.value = useObservable(getPhrasalVerbsCollection());
+  currentLanguageWords.value = useObservable(getFilteredPhrasalVerbs());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    currentLanguageWords.value = useObservable(getPhrasalVerbsCollection());
+    currentLanguageWords.value = useObservable(getFilteredPhrasalVerbs());
   }
 );
 
 onMounted(async () => {
-  currentLanguageWords.value = useObservable(getPhrasalVerbsCollection());
+  currentLanguageWords.value = useObservable(getFilteredPhrasalVerbs());
 });
 </script>

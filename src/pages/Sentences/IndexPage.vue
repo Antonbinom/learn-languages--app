@@ -19,8 +19,8 @@ const links = [
     show: true,
   },
   {
-    name: 'sets',
-    path: '/words/sets',
+    name: 'collections',
+    path: '/words/collections',
   },
   {
     name: 'trainings',

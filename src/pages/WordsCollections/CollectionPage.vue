@@ -26,12 +26,12 @@ q-footer
     q-btn(
       color="warning"
       :label="$t('back')"
-      @click="$router.push('/words/sets')"
+      @click="$router.push('/words/collections')"
     )
     q-btn(
       color="teal"
       :label="$t('edit')"
-      @click="$router.push(`/words/sets/edit/${$route.params.name}`)"
+      @click="$router.push(`/words/collections/edit/${$route.params.name}`)"
     )
 .q-px-md.absolute-center.full-width.text-center(v-if="!filteredTerms?.length")
   .text-h5.text-grey {{$t('There is nothing')}}
@@ -55,13 +55,21 @@ const route = useRoute();
 const { currentPageTitle } = useUtils();
 
 const scrollAreaHeight = ref();
-const setName = ref('');
+const collectionName = ref('');
 const vocabularyTerms = ref();
-const setTerms = ref([]);
+const collectionTerms = ref([]);
 
 const filteredTerms = computed(() => {
-  return setTerms.value
-    ?.filter((item) => item.term.includes(languagesStore.searchValue))
+  return collectionTerms.value
+    ?.filter(
+      (item) =>
+        item.term
+          .toLowerCase()
+          .includes(languagesStore.searchValue.toLowerCase()) ||
+        item.translation
+          .toLowerCase()
+          .includes(languagesStore.searchValue.toLowerCase())
+    )
     .sort((a, b) => a.term.localeCompare(b.term));
 });
 
@@ -71,17 +79,19 @@ onMounted(async () => {
     .equals(languagesStore.currentLanguage)
     .first();
 
-  const { terms: setTermsIds, name } = await db.wordsSets
+  const { terms: collectionTermsIds, name } = await db.wordsCollections
     .where('lang')
     .equals(languagesStore.currentLanguage)
-    .and((set) => set.name === route.params.name)
+    .and((collection) => collection.name === route.params.name)
     .first();
 
   vocabularyTerms.value = terms.filter(
-    (item) => !setTermsIds.includes(item.id)
+    (item) => !collectionTermsIds.includes(item.id)
   );
-  setTerms.value = terms.filter((item) => setTermsIds.includes(item.id));
-  setName.value = name;
+  collectionTerms.value = terms.filter((item) =>
+    collectionTermsIds.includes(item.id)
+  );
+  collectionName.value = name;
   scrollAreaHeight.value =
     document.getElementsByClassName('q-page')[0]?.clientHeight - 80 + 'px';
 });

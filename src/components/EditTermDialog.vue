@@ -42,7 +42,7 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 import { onMounted } from 'vue';
 //
 const drawersStore = useDrawersStore();
-const languageStore = useLanguagesStore();
+const languagesStore = useLanguagesStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -74,12 +74,12 @@ const editTerm = () => {
   if (route.path === '/words/vocabulary') {
     editVocabularyTerm(item.value.id, {
       ...item.value,
-      id: `${item.value.term}-${languageStore.currentLanguage}`,
+      id: `${item.value.term}-${languagesStore.currentLanguage}`,
     });
   } else if (route.path === '/phrasal-verbs') {
     editPhrasalVerb(item.value.id, {
       ...item.value,
-      id: `${item.value.term}-${languageStore.currentLanguage}`,
+      id: `${item.value.term}-${languagesStore.currentLanguage}`,
     });
   }
 };

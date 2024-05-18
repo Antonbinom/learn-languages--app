@@ -3,6 +3,7 @@ import { liveQuery } from 'dexie';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
 import useAppEventBus from 'src/composables/useAppEventBus';
+import { useErrors } from './useErrors';
 
 interface Term {
   id: string;
@@ -17,6 +18,7 @@ export const usePhrasalVerbs = () => {
   const currentLanguage = computed(() => {
     return languagesStore.currentLanguage;
   });
+  const { alreadyExists } = useErrors();
 
   const createPhrasalVerbsCollection = async () => {
     await db.phrasalVerbs.add({ lang: currentLanguage.value, terms: [] });
@@ -38,7 +40,7 @@ export const usePhrasalVerbs = () => {
       .first();
   };
 
-  const getPhrasalVerbsCollection = () => {
+  const getFilteredPhrasalVerbs = () => {
     const languageName = currentLanguage.value;
 
     const phrasalVerbsPromise = db.phrasalVerbs
@@ -56,15 +58,19 @@ export const usePhrasalVerbs = () => {
     return filteredPhrasalVerbs;
   };
 
-  const addNewPhrasalVerb = async (term: Term) => {
-    if (!(await db.phrasalVerbs.toArray()).length) {
+  const addNewPhrasalVerb = async (data: Term) => {
+    if (!(await getPhrasalVerbs())) {
       await createPhrasalVerbsCollection();
     }
+    if (await getPhrasalVerb(data.term)) {
+      alreadyExists('phrasal verb', data.term);
+    }
+
     await db.phrasalVerbs
       .where('lang')
       .equals(currentLanguage.value)
       .modify((collection) => {
-        collection.terms.push(term);
+        collection.terms.push(data);
       });
     $emit('request-phrasal-verbs');
   };
@@ -98,6 +104,9 @@ export const usePhrasalVerbs = () => {
   };
 
   const editPhrasalVerb = async (termId: string, data: Term) => {
+    if (await getPhrasalVerb(data.term)) {
+      alreadyExists('phrasal verb', data.term);
+    }
     const collection = await db.phrasalVerbs
       .where('lang')
       .equals(currentLanguage.value)
@@ -119,7 +128,7 @@ export const usePhrasalVerbs = () => {
     createPhrasalVerbsCollection,
     getPhrasalVerb,
     getPhrasalVerbs,
-    getPhrasalVerbsCollection,
+    getFilteredPhrasalVerbs,
     addNewPhrasalVerb,
     removePhrasalVerb,
     editPhrasalVerb,

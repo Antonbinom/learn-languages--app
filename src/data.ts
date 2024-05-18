@@ -1,9 +1,3 @@
-// interface Page {
-//   name: string;
-//   label: string;
-//   path: string;
-//   children?: Page[];
-
 import { useRoute } from 'vue-router';
 
 // }
@@ -22,14 +16,14 @@ export const pages = () => {
           path: '/words/vocabulary',
         },
         {
-          name: 'words sets',
-          label: 'Words sets',
-          path: '/words/sets',
+          name: 'words collections',
+          label: 'Words collections',
+          path: '/words/collections',
         },
         {
           name: `${route?.params?.name}`,
-          label: 'Words sets',
-          path: `/words/sets${'/' + route?.params?.name || ''}`,
+          label: 'Words collections',
+          path: `/words/collections${'/' + route?.params?.name || ''}`,
         },
         {
           name: 'trainings',
@@ -42,14 +36,14 @@ export const pages = () => {
           path: '/trainings/words',
         },
         {
-          name: 'create set',
-          label: 'Create set',
-          path: '/words/sets/create',
+          name: 'create collection',
+          label: 'Create collection',
+          path: '/words/collections/create',
         },
         {
           name: `Edit ${route?.params?.name}`,
-          label: 'Edit set',
-          path: `/words/sets/edit${'/' + route?.params?.name || ''}`,
+          label: 'Edit collection',
+          path: `/words/collections/edit${'/' + route?.params?.name || ''}`,
         },
       ],
     },
@@ -57,6 +51,11 @@ export const pages = () => {
       name: 'phrasal verbs',
       label: 'Phrasal verbs',
       path: '/phrasal-verbs',
+    },
+    {
+      name: 'irregular verbs',
+      label: 'Irregular verbs',
+      path: '/irregular-verbs',
     },
     {
       name: 'sentences',
@@ -84,6 +83,11 @@ export const pages = () => {
       name: 'books',
       label: 'Books',
       path: '/books',
+    },
+    {
+      name: 'translater',
+      label: 'Translater',
+      path: '/translater',
     },
   ];
 };

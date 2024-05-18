@@ -24,43 +24,45 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/words/sets',
+    path: '/words/collections',
     component: () => import('layouts/NoFooterLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/IndexPage.vue'),
+        component: () => import('pages/WordsCollections/IndexPage.vue'),
       },
     ],
   },
   {
-    path: '/words/sets/create',
+    path: '/words/collections/create',
     component: () => import('layouts/NoFooterLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/CreateSetPage.vue'),
+        component: () =>
+          import('pages/WordsCollections/CreateCollectionPage.vue'),
       },
     ],
   },
   {
-    path: '/words/sets/:name',
+    path: '/words/collections/:name',
     component: () => import('layouts/EmptyLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/SetPage.vue'),
+        component: () => import('pages/WordsCollections/CollectionPage.vue'),
       },
-      // { path: 'edit', component: () => import('pages/EditWordsSetPage.vue') },
+      // { path: 'edit', component: () => import('pages/EditwordsCollectionPage.vue') },
     ],
   },
   {
-    path: '/words/sets/edit/:name',
+    path: '/words/collections/edit/:name',
     component: () => import('layouts/EmptyLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/WordsSets/EditSetPage.vue'),
+        component: () =>
+          import('pages/WordsCollections/EditCollectionPage.vue'),
       },
     ],
   },
@@ -92,7 +94,19 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/Trainings/IndexPage.vue') },
       {
         path: 'words',
-        component: () => import('pages/Trainings/Words/IndexPage.vue'),
+        component: () => import('pages/Trainings/WordsPage.vue'),
+      },
+      {
+        path: 'phrasal-verbs',
+        component: () => import('pages/Trainings/PhrasalVerbsPage.vue'),
+      },
+      {
+        path: 'irregular-verbs',
+        component: () => import('pages/Trainings/IrregularVerbsPage.vue'),
+      },
+      {
+        path: 'sentences',
+        component: () => import('pages/Trainings/SentencesPage.vue'),
       },
     ],
   },
@@ -102,7 +116,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/Trainings/Words/SprintPage.vue'),
+        component: () => import('pages/Trainings/SprintPage.vue'),
       },
     ],
   },
@@ -112,7 +126,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/Trainings/Words/SpellingPage.vue'),
+        component: () => import('pages/Trainings/SpellingPage.vue'),
       },
     ],
   },
@@ -122,7 +136,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/Trainings/Words/TermQuizPage.vue'),
+        component: () => import('pages/Trainings/TermQuizPage.vue'),
       },
     ],
   },
@@ -132,7 +146,47 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('pages/Trainings/Words/RepeatPage.vue'),
+        component: () => import('pages/Trainings/RepeatPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/phrasal-verbs/sprint',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/SprintPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/phrasal-verbs/spelling',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/SpellingPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/phrasal-verbs/quiz',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/TermQuizPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/phrasal-verbs/repeat',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/RepeatPage.vue'),
       },
     ],
   },
