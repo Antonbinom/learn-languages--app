@@ -74,6 +74,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/irregular-verbs',
+    component: () => import('layouts/NoFooterLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/IrregularVerbs/IndexPage.vue'),
+      },
+    ],
+  },
+  {
     path: '/sentences',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -182,6 +192,46 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/trainings/phrasal-verbs/repeat',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/RepeatPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/irregular-verbs/sprint',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/SprintPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/irregular-verbs/spelling',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/SpellingPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/irregular-verbs/quiz',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Trainings/TermQuizPage.vue'),
+      },
+    ],
+  },
+  {
+    path: '/trainings/irregular-verbs/repeat',
     component: () => import('layouts/EmptyLayout.vue'),
     children: [
       {

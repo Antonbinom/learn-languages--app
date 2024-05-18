@@ -30,25 +30,20 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
 
 <script setup>
 import { computed, onMounted, ref, reactive } from 'vue';
-import { useRoute } from 'vue-router';
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
 import ModeTogglerComponent from 'src/components/Trainings/ModeTogglerComponent.vue';
 import SpellingComponent from 'src/components/Trainings/SpellingComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
-
-import { useVocabulary } from 'src/composables/useVocabulary';
-import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
+// Composables
+import useTerms from 'src/composables/useTerms';
 //Stores
 import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const { currentLanguage } = useLanguagesStore();
 
-const { getVocabulary } = useVocabulary();
-const { getPhrasalVerbs } = usePhrasalVerbs();
-
-const route = useRoute();
+const { getTerms } = useTerms();
 
 const isPresettings = ref(true);
 const isTraining = ref(false);
@@ -141,17 +136,8 @@ function resetTraining() {
 }
 
 onMounted(async () => {
-  let termsArray;
-  if (route.path === '/trainings/words/spelling') {
-    const { terms } = await getVocabulary();
-    termsArray = terms;
-  } else if (route.path === '/trainings/phrasal-verbs/spelling') {
-    const { terms } = await getPhrasalVerbs();
-    termsArray = terms;
-  }
-  terms.value = termsArray.filter((item) => item.training);
+  terms.value = await getTerms();
   notPassedTerms.value = [...terms.value];
-
   setQuestionTerm();
 });
 </script>

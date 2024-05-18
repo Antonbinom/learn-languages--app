@@ -1,17 +1,17 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="phrasalVerbs?.value?.length || languagesStore.searchValue")
+  SearchComponent.q-px-md(v-if="irregularVerbs?.value?.length || languagesStore.searchValue")
 
   ListComponent(
-    :items="phrasalVerbs")
-  .q-px-md.absolute-center.full-width.text-center(v-if="!phrasalVerbs?.value?.length")
+    :items="irregularVerbs")
+  .q-px-md.absolute-center.full-width.text-center(v-if="!irregularVerbs?.value?.length")
     .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useObservable } from '@vueuse/rxjs';
-import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
+import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 import useAppEventBus from 'src/composables/useAppEventBus';
 
 //Components
@@ -23,24 +23,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getFilteredPhrasalVerbs } = usePhrasalVerbs();
+const { getFilteredIrregularVerbs } = useIrregularVerbs();
 
 const { $on } = useAppEventBus();
 
-let phrasalVerbs = ref();
+let irregularVerbs = ref();
 
-$on('request-phrasal-verbs', () => {
-  phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+$on('request-irregular-verbs', () => {
+  irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+    irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
   }
 );
 
 onMounted(async () => {
-  phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+  irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
 });
 </script>

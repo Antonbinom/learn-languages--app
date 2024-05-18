@@ -32,9 +32,6 @@ q-dialog(
 <script setup>
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import useUtils from 'src/composables/useUtils';
-import { useVocabulary } from 'src/composables/useVocabulary';
-import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 
 //Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
@@ -42,9 +39,15 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const drawersStore = useDrawersStore();
 const languagesStore = useLanguagesStore();
+// Composables
+import useUtils from 'src/composables/useUtils';
+import { useVocabulary } from 'src/composables/useVocabulary';
+import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
+import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 const { currentPageTitle } = useUtils();
 const { addNewVocabularyTerm } = useVocabulary();
 const { addNewPhrasalVerb } = usePhrasalVerbs();
+const { addNewIrregularVerb } = useIrregularVerbs();
 
 const route = useRoute();
 
@@ -65,17 +68,22 @@ const isInputsValid = computed(() => {
 
 const addTerm = async () => {
   if (!isInputsValid.value) return;
-  if (route.path === '/words/vocabulary') {
-    item.value.id = await addNewVocabularyTerm({
-      id: `${item.value.term}-${languagesStore.currentLanguage}`,
-      ...item.value,
-    });
-  } else if (route.path === '/phrasal-verbs') {
-    item.value.id = await addNewPhrasalVerb({
-      id: `${item.value.term}-${languagesStore.currentLanguage}`,
-      ...item.value,
-    });
-  }
+  const data = {
+    id: `${item.value.term.split(', ').join('-')}-${
+      languagesStore.currentLanguage
+    }`,
+    ...item.value,
+  };
+
+  const routeActions = {
+    '/words/vocabulary': addNewVocabularyTerm,
+    '/phrasal-verbs': addNewPhrasalVerb,
+    '/irregular-verbs': addNewIrregularVerb,
+  };
+
+  const createAction = routeActions[route.path];
+  item.value.id = await createAction(data);
+
   item.value = {
     term: '',
     translation: '',

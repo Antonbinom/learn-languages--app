@@ -9,6 +9,10 @@ export interface PhrasalVerbs {
   lang: string;
   terms: Term[];
 }
+export interface IrregularVerbs {
+  lang: string;
+  terms: Term[];
+}
 export interface wordsCollections {
   name: string;
   lang: string;
@@ -31,6 +35,7 @@ interface Term {
 export class MySubClassedDexie extends Dexie {
   vocabularies!: Table<Vocabulary>;
   phrasalVerbs!: Table<PhrasalVerbs>;
+  irregularVerbs!: Table<IrregularVerbs>;
   wordsCollections!: Table<wordsCollections>;
   phrasalVerbsCollections!: Table<PhrasalVerbsCollections>;
 
@@ -39,6 +44,7 @@ export class MySubClassedDexie extends Dexie {
     this.version(1).stores({
       vocabularies: '++id, lang, terms',
       phrasalVerbs: '++id, lang, terms',
+      irregularVerbs: '++id, lang, terms',
       wordsCollections: '++id, name, lang, terms',
       phrasalVerbsCollections: '++id, name, lang, terms',
     });

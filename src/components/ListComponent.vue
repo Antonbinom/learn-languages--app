@@ -44,9 +44,6 @@ AddTermDialog
 <script setup>
 import { ref, toRefs, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useVocabulary } from 'src/composables/useVocabulary';
-import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
-
 //Components
 import AddTermDialog from 'src/components/AddTermDialog.vue';
 import EditTermDialog from 'src/components/EditTermDialog.vue';
@@ -55,11 +52,18 @@ import ResponsiveScrollArea from 'src/components/ResponsiveScrollArea.vue';
 import { useDrawersStore } from 'src/stores/drawersStore';
 //
 const drawersStore = useDrawersStore();
+// Composables
+import { useVocabulary } from 'src/composables/useVocabulary';
+import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
+import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
+//
+const { removeVocabularyTerm } = useVocabulary();
+const { removePhrasalVerb } = usePhrasalVerbs();
+const { removeIrregularVerb } = useIrregularVerbs();
 
 const route = useRoute();
 const router = useRouter();
-const { removeVocabularyTerm } = useVocabulary();
-const { removePhrasalVerb } = usePhrasalVerbs();
+
 const props = defineProps({
   items: Object,
 });
@@ -67,11 +71,15 @@ const { items: itemsRef } = toRefs(props);
 
 const removeTerm = async (id, index) => {
   itemsRef.value.value.splice(index, 1);
-  if (route.path === '/words/vocabulary') {
-    await removeVocabularyTerm(id);
-  } else if (route.path === '/phrasal-verbs') {
-    removePhrasalVerb(id);
-  }
+
+  const routeActions = {
+    '/words/vocabulary': removeVocabularyTerm,
+    '/phrasal-verbs': removePhrasalVerb,
+    '/irregular-verbs': removeIrregularVerb,
+  };
+
+  const removeAction = routeActions[route.path];
+  if (removeAction) removeAction(id);
 };
 
 // const addToTraining = ({ reset }, item) => {
@@ -85,7 +93,7 @@ const removeTerm = async (id, index) => {
 
 const openEditTerm = ({ reset }, term) => {
   drawersStore.setIsEditTermOpen(true);
-  router.push({ query: { term: term.toLowerCase() } });
+  router.push({ query: { term: term.toLowerCase().split(', ').join('-') } });
   reset();
 };
 

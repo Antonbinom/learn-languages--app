@@ -51,11 +51,81 @@ export const pages = () => {
       name: 'phrasal verbs',
       label: 'Phrasal verbs',
       path: '/phrasal-verbs',
+      children: [
+        {
+          name: 'collections',
+          label: 'Phrasal verbs collections',
+          path: '/phrasal-verbs/collections',
+        },
+        {
+          name: `${route?.params?.name}`,
+          label: 'Phrasal verbs collections',
+          path: `/phrasal-verbs/collections${'/' + route?.params?.name || ''}`,
+        },
+        {
+          name: 'trainings',
+          label: 'Trainings',
+          path: '/phrasal-verbs/trainings',
+        },
+        {
+          name: 'phrasal verbs',
+          label: 'Phrasal verbs',
+          path: '/trainings/phrasal-verbs',
+        },
+        {
+          name: 'create collection',
+          label: 'Create collection',
+          path: '/phrasal-verbs/collections/create',
+        },
+        {
+          name: `Edit ${route?.params?.name}`,
+          label: 'Edit collection',
+          path: `/phrasal-verbs/collections/edit${
+            '/' + route?.params?.name || ''
+          }`,
+        },
+      ],
     },
     {
       name: 'irregular verbs',
       label: 'Irregular verbs',
       path: '/irregular-verbs',
+      children: [
+        {
+          name: 'collections',
+          label: 'Irregular verbs collections',
+          path: '/irregular-verbs/collections',
+        },
+        {
+          name: `${route?.params?.name}`,
+          label: 'Irregular verbs collections',
+          path: `/irregular-verbs/collections${
+            '/' + route?.params?.name || ''
+          }`,
+        },
+        {
+          name: 'trainings',
+          label: 'Trainings',
+          path: '/irregular-verbs/trainings',
+        },
+        {
+          name: 'irregular verbs',
+          label: 'Irregular verbs',
+          path: '/trainings/irregular-verbs',
+        },
+        {
+          name: 'create collection',
+          label: 'Create collection',
+          path: '/irregular-verbs/collections/create',
+        },
+        {
+          name: `Edit ${route?.params?.name}`,
+          label: 'Edit collection',
+          path: `/irregular-verbs/collections/edit${
+            '/' + route?.params?.name || ''
+          }`,
+        },
+      ],
     },
     {
       name: 'sentences',
@@ -76,6 +146,21 @@ export const pages = () => {
           name: 'words',
           label: 'Words',
           path: '/trainings/words',
+        },
+        {
+          name: 'phrasal verbs',
+          label: 'Phrasal verbs',
+          path: '/trainings/phrasal-verbs',
+        },
+        {
+          name: 'irregular verbs',
+          label: 'Irregular verbs',
+          path: '/trainings/irregular-verbs',
+        },
+        {
+          name: 'sentences',
+          label: 'Sentences',
+          path: '/trainings/sentences',
         },
       ],
     },

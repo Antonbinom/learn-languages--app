@@ -6,7 +6,10 @@ q-page.q-px-md
 </template>
 
 <script setup>
-const links = [
+import { useVocabulary } from 'src/composables/useVocabulary';
+import { onMounted, ref } from 'vue';
+const { getVocabulary } = useVocabulary();
+const links = ref([
   {
     name: 'sprint',
     path: '/trainings/words/sprint',
@@ -23,5 +26,10 @@ const links = [
     name: 'repeat',
     path: '/trainings/words/repeat',
   },
-];
+]);
+
+onMounted(async () => {
+  const { terms } = await getVocabulary();
+  terms?.length < 4 && links.value.splice(2, 1);
+});
 </script>

@@ -30,26 +30,29 @@ q-dialog(
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import useUtils from 'src/composables/useUtils';
-import { useVocabulary } from 'src/composables/useVocabulary';
-import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
-
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
 //Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
 import { useLanguagesStore } from 'src/stores/languagesStore';
-import { onMounted } from 'vue';
 //
 const drawersStore = useDrawersStore();
 const languagesStore = useLanguagesStore();
 
-const route = useRoute();
-const router = useRouter();
-
+//Composables
+import useUtils from 'src/composables/useUtils';
+import { useVocabulary } from 'src/composables/useVocabulary';
+import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
+import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
+//
 const { currentPageTitle } = useUtils();
 const { editVocabularyTerm, getVocabularyTerm } = useVocabulary();
 const { editPhrasalVerb, getPhrasalVerb } = usePhrasalVerbs();
+const { editIrregularVerb, getIrregularVerb } = useIrregularVerbs();
+
+const route = useRoute();
+const router = useRouter();
 
 const item = ref({
   id: '',
@@ -71,17 +74,20 @@ const isInputsValid = computed(() => {
 
 const editTerm = () => {
   if (!isInputsValid.value) return;
-  if (route.path === '/words/vocabulary') {
-    editVocabularyTerm(item.value.id, {
-      ...item.value,
-      id: `${item.value.term}-${languagesStore.currentLanguage}`,
-    });
-  } else if (route.path === '/phrasal-verbs') {
-    editPhrasalVerb(item.value.id, {
-      ...item.value,
-      id: `${item.value.term}-${languagesStore.currentLanguage}`,
-    });
-  }
+  const data = {
+    ...item.value,
+    id: `${item.value.term.split(', ').join('-')}-${
+      languagesStore.currentLanguage
+    }`,
+  };
+  const routeActions = {
+    '/words/vocabulary': editVocabularyTerm,
+    '/phrasal-verbs': editPhrasalVerb,
+    '/irregular-verbs': editIrregularVerb,
+  };
+
+  const editAction = routeActions[route.path];
+  if (editAction) editAction(item.value.id, data);
 };
 
 const closePopup = () => {
@@ -94,6 +100,8 @@ onMounted(async () => {
     item.value = await getVocabularyTerm(route.query.term);
   } else if (route.path === '/phrasal-verbs') {
     item.value = await getPhrasalVerb(route.query.term);
+  } else if (route.path === '/irregular-verbs') {
+    item.value = await getIrregularVerb(route.query.term);
   }
 });
 </script>
