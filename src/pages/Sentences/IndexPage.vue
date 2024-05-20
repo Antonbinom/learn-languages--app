@@ -1,35 +1,45 @@
 <template lang="pug">
-q-page.q-px-md
-  .q-py-md.q-gutter-sm.column
-    router-link(v-for="link in links" :key="link.name" :to="link.path")
-      q-btn(v-if="link?.show || termsLength" color="white" text-color="dark" style="width: 100%") {{$t(link.name)}}
+q-page
+  SearchComponent.q-px-md(v-if="sentences?.value?.length || languagesStore.searchValue")
+  ListComponent(
+    :items="sentences")
+  .q-px-md.absolute-center.full-width.text-center(v-if="!sentences?.value?.length")
+    .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
 <script setup>
-import { useVocabulary } from 'src/composables/useVocabulary';
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
+import { useObservable } from '@vueuse/rxjs';
+import { useSentences } from 'src/composables/useSentences';
+import useAppEventBus from 'src/composables/useAppEventBus';
 
-const { getVocabulary } = useVocabulary();
-const termsLength = ref(0);
-const links = [
-  {
-    name: 'vocabulary',
-    path: '/words/vocabulary',
-    show: true,
-  },
-  {
-    name: 'collections',
-    path: '/words/collections',
-  },
-  {
-    name: 'trainings',
-    path: '/trainings/words',
-  },
-];
+//Components
+import SearchComponent from 'components/SearchComponent.vue';
+import ListComponent from 'components/ListComponent.vue';
+
+//Stores
+import { useLanguagesStore } from 'src/stores/languagesStore';
+//
+const languagesStore = useLanguagesStore();
+
+const { getFilteredSentences } = useSentences();
+
+const { $on } = useAppEventBus();
+
+let sentences = ref();
+
+$on('request-sentences', () => {
+  sentences.value = useObservable(getFilteredSentences());
+});
+
+watch(
+  () => languagesStore.searchValue || languagesStore.currentLanguage,
+  async () => {
+    sentences.value = useObservable(getFilteredSentences());
+  }
+);
 
 onMounted(async () => {
-  const { terms } = await getVocabulary();
-  termsLength.value = terms.length;
+  sentences.value = useObservable(getFilteredSentences());
 });
 </script>

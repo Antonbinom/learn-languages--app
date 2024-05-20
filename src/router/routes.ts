@@ -85,7 +85,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/sentences',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/NoFooterLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Sentences/IndexPage.vue') },
     ],

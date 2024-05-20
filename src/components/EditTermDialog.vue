@@ -45,11 +45,13 @@ import useUtils from 'src/composables/useUtils';
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
+import { useSentences } from 'src/composables/useSentences';
 //
 const { currentPageTitle } = useUtils();
 const { editVocabularyTerm, getVocabularyTerm } = useVocabulary();
 const { editPhrasalVerb, getPhrasalVerb } = usePhrasalVerbs();
 const { editIrregularVerb, getIrregularVerb } = useIrregularVerbs();
+const { editSentence, getSentence } = useSentences();
 
 const route = useRoute();
 const router = useRouter();
@@ -76,7 +78,7 @@ const editTerm = () => {
   if (!isInputsValid.value) return;
   const data = {
     ...item.value,
-    id: `${item.value.term.split(', ').join('-')}-${
+    id: `${item.value.term.toLowerCase().split(', ').join('-')}-${
       languagesStore.currentLanguage
     }`,
   };
@@ -84,10 +86,15 @@ const editTerm = () => {
     '/words/vocabulary': editVocabularyTerm,
     '/phrasal-verbs': editPhrasalVerb,
     '/irregular-verbs': editIrregularVerb,
+    '/sentences': editSentence,
   };
 
   const editAction = routeActions[route.path];
   if (editAction) editAction(item.value.id, data);
+
+  router.push({
+    query: { term: item.value.term.toLowerCase().split(', ').join('-') },
+  });
 };
 
 const closePopup = () => {
@@ -102,6 +109,8 @@ onMounted(async () => {
     item.value = await getPhrasalVerb(route.query.term);
   } else if (route.path === '/irregular-verbs') {
     item.value = await getIrregularVerb(route.query.term);
+  } else if (route.path === '/sentences') {
+    item.value = await getSentence(route.query.term);
   }
 });
 </script>

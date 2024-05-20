@@ -26,7 +26,7 @@ export default {
   'save and exit': 'save and exit',
   'add to training': 'add to training',
   'add new words collection': 'add new words collection',
-  'add term': 'add term',
+  'add new': 'add new',
   'edit term': 'edit term',
   'add words to collection': 'add words to collection',
   'remove words from collection': 'remove words from collection',

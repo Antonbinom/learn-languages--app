@@ -44,10 +44,13 @@ import useUtils from 'src/composables/useUtils';
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
+import { useSentences } from 'src/composables/useSentences';
+//
 const { currentPageTitle } = useUtils();
 const { addNewVocabularyTerm } = useVocabulary();
 const { addNewPhrasalVerb } = usePhrasalVerbs();
 const { addNewIrregularVerb } = useIrregularVerbs();
+const { addNewSentence } = useSentences();
 
 const route = useRoute();
 
@@ -69,7 +72,7 @@ const isInputsValid = computed(() => {
 const addTerm = async () => {
   if (!isInputsValid.value) return;
   const data = {
-    id: `${item.value.term.split(', ').join('-')}-${
+    id: `${item.value.term.toLocaleLowerCase().split(', ').join('-')}-${
       languagesStore.currentLanguage
     }`,
     ...item.value,
@@ -79,6 +82,7 @@ const addTerm = async () => {
     '/words/vocabulary': addNewVocabularyTerm,
     '/phrasal-verbs': addNewPhrasalVerb,
     '/irregular-verbs': addNewIrregularVerb,
+    '/sentences': addNewSentence,
   };
 
   const createAction = routeActions[route.path];

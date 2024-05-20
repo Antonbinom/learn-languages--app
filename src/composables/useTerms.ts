@@ -2,12 +2,14 @@ import { useRoute } from 'vue-router';
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from './useIrregularVerbs';
+import { useSentences } from 'src/composables/useSentences';
 
 const useTerms = () => {
   const route = useRoute();
   const { getVocabulary } = useVocabulary();
   const { getPhrasalVerbs } = usePhrasalVerbs();
   const { getIrregularVerbs } = useIrregularVerbs();
+  const { getSentences } = useSentences();
 
   type Term = {
     id: string;
@@ -24,6 +26,7 @@ const useTerms = () => {
       '/trainings/words': getVocabulary,
       '/trainings/phrasal-verbs': getPhrasalVerbs,
       '/trainings/irregular-verbs': getIrregularVerbs,
+      '/trainings/sentences': getSentences,
     };
 
     const fetchAction = Object.keys(routeActions).find((key) =>

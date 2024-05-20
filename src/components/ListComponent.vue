@@ -35,7 +35,7 @@ q-footer
     @click="drawersStore.setIsAddTermOpen(true)"
     square
     color="warning"
-    :label="$t('add term')"
+    :label="$t('add new')"
 )
 EditTermDialog(v-if="$route.query.term")
 AddTermDialog
@@ -56,10 +56,12 @@ const drawersStore = useDrawersStore();
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
+import { useSentences } from 'src/composables/useSentences';
 //
 const { removeVocabularyTerm } = useVocabulary();
 const { removePhrasalVerb } = usePhrasalVerbs();
 const { removeIrregularVerb } = useIrregularVerbs();
+const { removeSentence } = useSentences();
 
 const route = useRoute();
 const router = useRouter();
@@ -76,6 +78,7 @@ const removeTerm = async (id, index) => {
     '/words/vocabulary': removeVocabularyTerm,
     '/phrasal-verbs': removePhrasalVerb,
     '/irregular-verbs': removeIrregularVerb,
+    '/sentences': removeSentence,
   };
 
   const removeAction = routeActions[route.path];
