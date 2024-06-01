@@ -74,7 +74,7 @@ import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 import { useSentences } from 'src/composables/useSentences';
 //
-const { removeVocabularyTerm, editVocabularyTerm } = useVocabulary();
+const { removeWord, editWord } = useVocabulary();
 const { removePhrasalVerb, editPhrasalVerb } = usePhrasalVerbs();
 const { removeIrregularVerb, editIrregularVerb } = useIrregularVerbs();
 const { removeSentence, editSentence } = useSentences();
@@ -91,7 +91,7 @@ const removeTerm = async (id, index) => {
   itemsRef.value.value.splice(index, 1);
 
   const routeActions = {
-    '/words/vocabulary': removeVocabularyTerm,
+    '/words/vocabulary': removeWord,
     '/phrasal-verbs': removePhrasalVerb,
     '/irregular-verbs': removeIrregularVerb,
     '/sentences': removeSentence,
@@ -107,7 +107,7 @@ const toggleTraining = async (item) => {
     training: !item.training,
   };
   const routeActions = {
-    '/words/vocabulary': editVocabularyTerm,
+    '/words/vocabulary': editWord,
     '/phrasal-verbs': editPhrasalVerb,
     '/irregular-verbs': editIrregularVerb,
     '/sentences': editSentence,

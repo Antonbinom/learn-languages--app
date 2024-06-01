@@ -64,7 +64,7 @@ import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 import { useSentences } from 'src/composables/useSentences';
 //
 const { currentPageTitle } = useUtils();
-const { editVocabularyTerm, getVocabularyTerm } = useVocabulary();
+const { editWord, getWord } = useVocabulary();
 const { editPhrasalVerb, getPhrasalVerb } = usePhrasalVerbs();
 const { editIrregularVerb, getIrregularVerb } = useIrregularVerbs();
 const { editSentence, getSentence } = useSentences();
@@ -101,7 +101,7 @@ const editTerm = async () => {
         : item.value.term,
   };
   const routeActions = {
-    '/words/vocabulary': editVocabularyTerm,
+    '/words/vocabulary': editWord,
     '/phrasal-verbs': editPhrasalVerb,
     '/irregular-verbs': editIrregularVerb,
     '/sentences': editSentence,
@@ -133,13 +133,13 @@ const closePopup = () => {
 onMounted(async () => {
   const termId = termsStore.currentTermId;
   if (route.path === '/words/vocabulary') {
-    item.value = await getVocabularyTerm(termId);
+    item.value = await getWord({ id: termId });
   } else if (route.path === '/phrasal-verbs') {
-    item.value = await getPhrasalVerb(termId);
+    item.value = await getPhrasalVerb({ id: termId });
   } else if (route.path === '/irregular-verbs') {
-    item.value = await getIrregularVerb(termId);
+    item.value = await getIrregularVerb({ id: termId });
   } else if (route.path === '/sentences') {
-    item.value = await getSentence(termId);
+    item.value = await getSentence({ id: termId });
   }
 });
 </script>

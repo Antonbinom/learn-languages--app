@@ -2,18 +2,12 @@ import { db } from 'src/db';
 import { liveQuery } from 'dexie';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
-import useAppEventBus from 'src/composables/useAppEventBus';
 import { useErrors } from './useErrors';
 import { phrasalVerbs } from 'src/data';
+import { PhrasalVerb } from 'src/components/models';
+import useAppEventBus from 'src/composables/useAppEventBus';
 import useUtils from 'src/composables/useUtils';
 
-interface Term {
-  id: string;
-  term: string;
-  translation: string;
-  explanation: string;
-  training: boolean;
-}
 export const usePhrasalVerbs = () => {
   const { $emit } = useAppEventBus();
   const languagesStore = useLanguagesStore();
@@ -24,138 +18,80 @@ export const usePhrasalVerbs = () => {
   });
   const { alreadyExists } = useErrors();
 
-  const createPhrasalVerbsCollection = async () => {
-    await db.phrasalVerbs.add({ lang: currentLanguage.value, terms: [] });
+  const getAllPhrasalVerbs = async () => {
+    return db.phrasalVerbs
+      .where({ lang: currentLanguage.value })
+      .sortBy('term');
   };
 
-  const getFilteredTerms = (terms: Term[], searchTerm: string) => {
-    const searchLower = searchTerm.toLowerCase();
-    return terms.filter(
-      (item) =>
-        item.term.includes(searchLower) ||
-        item.translation.includes(searchLower)
+  const getPhrasalVerbs = () => {
+    const searchLower = languagesStore.searchValue?.toLowerCase();
+
+    return liveQuery(() =>
+      db.phrasalVerbs
+        .where('lang')
+        .equals(currentLanguage.value)
+        .and(
+          (item) =>
+            item.term.toLowerCase().includes(searchLower) ||
+            item.translation.toLowerCase().includes(searchLower)
+        )
+        .sortBy('term')
     );
   };
 
-  const getPhrasalVerbs = async () => {
+  const getPhrasalVerb = async (query: object) => {
     return await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
+      .where({ lang: currentLanguage.value, ...query })
       .first();
   };
 
-  const getFilteredPhrasalVerbs = () => {
-    const languageName = currentLanguage.value;
-
-    const phrasalVerbsPromise = db.phrasalVerbs
-      .where('lang')
-      .equals(languageName)
-      .first()
-      .then((res) => res?.terms || []);
-
-    const filteredPhrasalVerbs = liveQuery(() =>
-      phrasalVerbsPromise.then((terms) =>
-        getFilteredTerms(terms, languagesStore.searchValue)
-      )
-    );
-
-    return filteredPhrasalVerbs;
-  };
-
-  const addNewPhrasalVerb = async (data: Term) => {
-    if (!(await getPhrasalVerbs())) {
-      await createPhrasalVerbsCollection();
-    }
-    if (await getPhrasalVerb(data.term)) {
+  const addNewPhrasalVerb = async (data: PhrasalVerb) => {
+    if (await getPhrasalVerb({ term: data.term })) {
       alreadyExists('phrasal verb', data.term);
     }
-
-    await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms.push(data);
-      });
+    await db.phrasalVerbs.add({ ...data, lang: currentLanguage.value });
     $emit('request-phrasal-verbs');
   };
 
-  const seedPhrasalVerbs = async () => {
-    if (!(await getPhrasalVerbs())) {
-      await createPhrasalVerbsCollection();
-      await db.phrasalVerbs
-        .where('lang')
-        .equals(currentLanguage.value)
-        .modify((collection) => {
-          phrasalVerbs.forEach(
-            (verb: {
-              term: string;
-              translation: string;
-              explanation?: string;
-            }) => {
-              collection.terms.push({
-                ...verb,
-                id: generateId(),
-                training: false,
-                explanation: '',
-              });
-            }
-          );
-        });
-    }
-  };
-
-  const getPhrasalVerb = async (id: string) => {
-    const collection = await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    return collection?.terms.find((term) => term.id === id);
-  };
-
   const removePhrasalVerb = async (id: string) => {
-    const collection = await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    const termIndex = collection?.terms.findIndex((term) => term.id === id);
-    if (termIndex === undefined) return;
-
-    db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms.splice(termIndex, 1);
-      });
+    await db.phrasalVerbs.where({ lang: currentLanguage.value, id }).delete();
   };
 
-  const editPhrasalVerb = async (id: string, data: Term, refresh?: boolean) => {
-    // if (await getPhrasalVerb(data.term)) {
-    //   alreadyExists('phrasal verb', data.term);
-    // }
-    const collection = await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    const termIndex = collection?.terms.findIndex((term) => term.id === id);
-    if (termIndex === undefined) return;
-
+  const editPhrasalVerb = async (
+    id: string,
+    data: PhrasalVerb,
+    refresh?: boolean
+  ) => {
     await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms[termIndex] = data;
-      });
+      .where({ lang: currentLanguage.value, id })
+      .modify(data);
     refresh && $emit('request-phrasal-verbs');
   };
 
+  const seedPhrasalVerbs = async () => {
+    if (!(await getAllPhrasalVerbs()).length) {
+      phrasalVerbs.forEach(
+        async (verb: {
+          term: string;
+          translation: string;
+          explanation?: string;
+        }) => {
+          await addNewPhrasalVerb({
+            ...verb,
+            lang: currentLanguage.value,
+            id: generateId(),
+            training: false,
+            explanation: '',
+          });
+        }
+      );
+    }
+  };
   return {
-    createPhrasalVerbsCollection,
     getPhrasalVerb,
     getPhrasalVerbs,
-    getFilteredPhrasalVerbs,
+    getAllPhrasalVerbs,
     addNewPhrasalVerb,
     removePhrasalVerb,
     editPhrasalVerb,

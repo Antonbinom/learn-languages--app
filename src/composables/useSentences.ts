@@ -2,135 +2,95 @@ import { db } from 'src/db';
 import { liveQuery } from 'dexie';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
-import useAppEventBus from 'src/composables/useAppEventBus';
 import { useErrors } from './useErrors';
+// import { sentences } from 'src/data';
+import { Sentence } from 'src/components/models';
+import useAppEventBus from 'src/composables/useAppEventBus';
+// import useUtils from 'src/composables/useUtils';
 
-interface Term {
-  id: string;
-  term: string;
-  translation: string;
-  explanation: string;
-  training: boolean;
-}
 export const useSentences = () => {
   const { $emit } = useAppEventBus();
   const languagesStore = useLanguagesStore();
+  // const { generateId } = useUtils();
+
   const currentLanguage = computed(() => {
     return languagesStore.currentLanguage;
   });
   const { alreadyExists } = useErrors();
 
-  const createSentencesCollection = async () => {
-    await db.sentences.add({ lang: currentLanguage.value, terms: [] });
+  const getAllSentences = async () => {
+    return db.sentences.where({ lang: currentLanguage.value }).sortBy('term');
   };
 
-  const getFilteredTerms = (terms: Term[], searchTerm: string) => {
-    const searchLower = searchTerm.toLowerCase();
-    return terms.filter(
-      (item) =>
-        item.term.toLowerCase().includes(searchLower.toLowerCase()) ||
-        item.translation.toLowerCase().includes(searchLower.toLowerCase())
+  const getSentences = () => {
+    const searchLower = languagesStore.searchValue?.toLowerCase();
+
+    return liveQuery(() =>
+      db.sentences
+        .where('lang')
+        .equals(currentLanguage.value)
+        .and(
+          (item) =>
+            item.term.toLowerCase().includes(searchLower) ||
+            item.translation.toLowerCase().includes(searchLower)
+        )
+        .sortBy('term')
     );
   };
 
-  const getSentences = async () => {
+  const getSentence = async (query: object) => {
     return await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
+      .where({ lang: currentLanguage.value, ...query })
       .first();
   };
 
-  const getFilteredSentences = () => {
-    const languageName = currentLanguage.value;
-
-    const sentencesPromise = db.sentences
-      .where('lang')
-      .equals(languageName)
-      .first()
-      .then((res) => res?.terms || []);
-
-    const filteredSentences = liveQuery(() =>
-      sentencesPromise.then((terms) =>
-        getFilteredTerms(terms, languagesStore.searchValue)
-      )
-    );
-
-    return filteredSentences;
-  };
-
-  const addNewSentence = async (data: Term) => {
-    if (!(await getSentences())) {
-      await createSentencesCollection();
+  const addNewSentence = async (data: Sentence) => {
+    if (await getSentence({ term: data.term })) {
+      alreadyExists('phrasal verb', data.term);
     }
-    if (await getSentence(data.term)) {
-      alreadyExists('sentence', data.term);
-    }
-
-    await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms.push(data);
-      });
-    $emit('request-sentences');
-  };
-
-  const getSentence = async (id: string) => {
-    const collection = await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    const collectionItem = collection?.terms.find((term) => term.id === id);
-
-    return collectionItem;
+    await db.sentences.add({ ...data, lang: currentLanguage.value });
+    $emit('request-phrasal-verbs');
   };
 
   const removeSentence = async (id: string) => {
-    const collection = await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    const termIndex = collection?.terms.findIndex((term) => term.id === id);
-    if (termIndex === undefined) return;
-
-    db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms.splice(termIndex, 1);
-      });
+    await db.sentences.where({ lang: currentLanguage.value, id }).delete();
   };
 
-  const editSentence = async (id: string, data: Term, refresh?: boolean) => {
-    // if (await getSentence(data.term)) {
-    //   alreadyExists('sentence', data.term);
-    // }
-    const collection = await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    const termIndex = collection?.terms.findIndex((term) => term.id === id);
-    if (termIndex === undefined) return;
-
-    await db.sentences
-      .where('lang')
-      .equals(currentLanguage.value)
-      .modify((collection) => {
-        collection.terms[termIndex] = data;
-      });
-    refresh && $emit('request-sentences');
+  const editSentence = async (
+    id: string,
+    data: Sentence,
+    refresh?: boolean
+  ) => {
+    await db.sentences.where({ lang: currentLanguage.value, id }).modify(data);
+    refresh && $emit('request-phrasal-verbs');
   };
 
+  // const seedSentences = async () => {
+  //   if (!(await getAllSentences()).length) {
+  //     sentences.forEach(
+  //       async (verb: {
+  //         term: string;
+  //         translation: string;
+  //         explanation?: string;
+  //       }) => {
+  //         await addNewSentence({
+  //           ...verb,
+  //           lang: currentLanguage.value,
+  //           id: generateId(),
+  //           training: false,
+  //           explanation: '',
+  //         });
+  //       }
+  //     );
+  //   }
+  // };
   return {
-    createSentencesCollection,
     getSentence,
     getSentences,
-    getFilteredSentences,
+    getAllSentences,
     addNewSentence,
     removeSentence,
     editSentence,
+    // seedSentences,
   };
 };

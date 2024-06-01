@@ -62,7 +62,7 @@ import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 import { useSentences } from 'src/composables/useSentences';
 //
 const { currentPageTitle, generateId } = useUtils();
-const { addNewVocabularyTerm } = useVocabulary();
+const { addNewWord } = useVocabulary();
 const { addNewPhrasalVerb } = usePhrasalVerbs();
 const { addNewIrregularVerb } = useIrregularVerbs();
 const { addNewSentence } = useSentences();
@@ -73,7 +73,7 @@ const item = ref({
   term: route.path === '/irregular-verbs' ? ['', '', ''] : '',
   translation: '',
   explanation: '',
-  training: true,
+  training: false,
 });
 
 const isAddTermOpen = computed(() => {
@@ -100,7 +100,7 @@ const addTerm = async () => {
   };
 
   const routeActions = {
-    '/words/vocabulary': addNewVocabularyTerm,
+    '/words/vocabulary': addNewWord,
     '/phrasal-verbs': addNewPhrasalVerb,
     '/irregular-verbs': addNewIrregularVerb,
     '/sentences': addNewSentence,
@@ -113,7 +113,7 @@ const addTerm = async () => {
     term: route.path === '/irregular-verbs' ? ['', '', ''] : '',
     translation: '',
     explanation: '',
-    training: true,
+    training: false,
   };
 };
 </script>

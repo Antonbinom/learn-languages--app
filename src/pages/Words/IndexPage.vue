@@ -10,7 +10,7 @@ import { useVocabulary } from 'src/composables/useVocabulary';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 
-const { getVocabulary } = useVocabulary();
+const { getAllWords } = useVocabulary();
 const termsLength = ref(0);
 const links = [
   {
@@ -29,7 +29,7 @@ const links = [
 ];
 
 onMounted(async () => {
-  const { terms } = await getVocabulary();
-  termsLength.value = terms.length;
+  const data = await getAllWords();
+  termsLength.value = data.length;
 });
 </script>

@@ -22,23 +22,23 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getFilteredPhrasalVerbs } = usePhrasalVerbs();
+const { getPhrasalVerbs } = usePhrasalVerbs();
 
 const { $on } = useAppEventBus();
 
 const phrasalVerbs = ref();
 $on('request-phrasal-verbs', () => {
-  phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+  phrasalVerbs.value = useObservable(getPhrasalVerbs());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   () => {
-    phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+    phrasalVerbs.value = useObservable(getPhrasalVerbs());
   }
 );
 
 onMounted(async () => {
-  phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
+  phrasalVerbs.value = useObservable(getPhrasalVerbs());
 });
 </script>

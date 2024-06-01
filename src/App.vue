@@ -30,8 +30,8 @@ defineOptions({
   name: 'App',
 });
 
-onMounted(() => {
-  seedIrregularVerbs();
-  seedPhrasalVerbs();
+onMounted(async () => {
+  await seedIrregularVerbs();
+  await seedPhrasalVerbs();
 });
 </script>

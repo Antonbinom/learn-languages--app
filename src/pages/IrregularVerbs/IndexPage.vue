@@ -23,24 +23,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getFilteredIrregularVerbs } = useIrregularVerbs();
+const { getIrregularVerbs } = useIrregularVerbs();
 
 const { $on } = useAppEventBus();
 
 let irregularVerbs = ref();
 
 $on('request-irregular-verbs', () => {
-  irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
+  irregularVerbs.value = useObservable(getIrregularVerbs());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
+    irregularVerbs.value = useObservable(getIrregularVerbs());
   }
 );
 
 onMounted(async () => {
-  irregularVerbs.value = useObservable(getFilteredIrregularVerbs());
+  irregularVerbs.value = useObservable(getIrregularVerbs());
 });
 </script>

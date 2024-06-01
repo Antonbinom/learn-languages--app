@@ -1,27 +1,33 @@
 // db.ts
 import Dexie, { Table } from 'dexie';
 
-export interface Vocabulary {
+export interface Word {
   lang: string;
-  terms: Term[];
+  term: string;
+  translation: string;
+  explanation?: string;
+  training: boolean;
 }
 export interface PhrasalVerbs {
   lang: string;
-  terms: Term[];
+  term: string;
+  translation: string;
+  explanation?: string;
+  training: boolean;
 }
 export interface IrregularVerbs {
   lang: string;
-  terms: {
-    id: string;
-    term: string;
-    translation: string;
-    explanation: string;
-    training: boolean;
-  }[];
+  term: string;
+  translation: string;
+  explanation?: string;
+  training: boolean;
 }
 export interface Sentences {
   lang: string;
-  terms: Term[];
+  term: string;
+  translation: string;
+  explanation?: string;
+  training: boolean;
 }
 export interface wordsCollections {
   name: string;
@@ -33,17 +39,9 @@ export interface PhrasalVerbsCollections {
   lang: string;
   terms: string[];
 }
-interface Term {
-  id: string;
-  term: string;
-  translation: string;
-  explanation: string;
-  training: boolean;
-  collectionId?: string;
-}
 
 export class MySubClassedDexie extends Dexie {
-  vocabularies!: Table<Vocabulary>;
+  words!: Table<Word>;
   phrasalVerbs!: Table<PhrasalVerbs>;
   irregularVerbs!: Table<IrregularVerbs>;
   sentences!: Table<Sentences>;
@@ -52,11 +50,14 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('learnLanguagesAppDB');
-    this.version(1).stores({
-      vocabularies: '++id, lang, terms',
-      phrasalVerbs: '++id, lang, terms',
-      irregularVerbs: '++id, lang, terms',
-      sentences: '++id, lang, terms',
+    this.version(6).stores({
+      words: '++id, [lang+term], [lang+id], lang, term, translation, training',
+      phrasalVerbs:
+        '++id,[lang+term], [lang+id], lang, term, translation, training',
+      irregularVerbs:
+        '++id,[lang+term], [lang+id], lang, term, translation, training',
+      sentences:
+        '++id,[lang+term], [lang+id], lang, term, translation, training',
       wordsCollections: '++id, name, lang, terms',
       phrasalVerbsCollections: '++id, name, lang, terms',
     });

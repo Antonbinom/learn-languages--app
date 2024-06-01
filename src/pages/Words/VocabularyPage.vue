@@ -22,24 +22,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getVocabularyTerms } = useVocabulary();
+const { getWords } = useVocabulary();
 
 const { $on } = useAppEventBus();
 
 let currentLanguageWords = ref();
 
-$on('request-vocabulary', () => {
-  currentLanguageWords.value = useObservable(getVocabularyTerms());
+$on('request-words', () => {
+  currentLanguageWords.value = useObservable(getWords());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    currentLanguageWords.value = useObservable(getVocabularyTerms());
+    currentLanguageWords.value = useObservable(getWords());
   }
 );
 
 onMounted(async () => {
-  currentLanguageWords.value = useObservable(getVocabularyTerms());
+  currentLanguageWords.value = useObservable(getWords());
 });
 </script>

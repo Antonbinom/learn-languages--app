@@ -24,15 +24,15 @@ q-page
       style="width: 100%"
       @click="showCollectionWords = true"
     )
-  SearchComponent.q-pb-md.q-px-md(v-if="(filteredTerms.length && !showCollectionWords) || (showCollectionWords && filteredCollectionTerms.length)")
-  ResponsiveScrollArea(v-if="filteredTerms.length && !showCollectionWords" :height="scrollAreaHeight")
+  SearchComponent.q-pb-md.q-px-md(v-if="(words.length && !showCollectionWords) || (showCollectionWords && collectionWords.length)")
+  ResponsiveScrollArea(v-if="words.length && !showCollectionWords" :height="scrollAreaHeight")
     q-item.items-center(
       clickable
       @click="addTerm(item.id)"
       dense
-      v-for="(item, index) in filteredTerms"
+      v-for="(item, index) in filteredWords"
       :key="item.id"
-      :style="{'border-bottom': (filteredTerms.length-1 !== index) ? '1px solid gray' : 'none'}"
+      :style="{'border-bottom': (filteredWords.length-1 !== index) ? '1px solid gray' : 'none'}"
       )
       q-item-section
         q-item-label {{ item.term}}
@@ -41,16 +41,16 @@ q-page
         color="positive"
         name="add"
       )
-  .q-px-md.absolute-center.full-width.text-center(v-if="!filteredTerms.length && !showCollectionWords")
+  .q-px-md.absolute-center.full-width.text-center(v-if="!filteredWords.length && !showCollectionWords")
     .text-h5.text-grey {{$t('There is nothing')}}
-  ResponsiveScrollArea(v-if="showCollectionWords && filteredCollectionTerms.length" :height="scrollAreaHeight")
+  ResponsiveScrollArea(v-if="showCollectionWords && filteredCollectionWords.length" :height="scrollAreaHeight")
     q-item.items-center(
       clickable
       @click="removeTerm(item.id)"
       dense
-      v-for="(item, index) in filteredCollectionTerms"
+      v-for="(item, index) in filteredCollectionWords"
       :key="item.id"
-      :style="(filteredCollectionTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
+      :style="(filteredCollectionWords.length-1 !== index) && {'border-bottom': '1px solid gray'}"
       )
       q-item-section
         q-item-label {{ item.term}}
@@ -59,7 +59,7 @@ q-page
         color="negative"
         name="remove"
       )
-  .q-px-md.absolute-center.full-width.text-center(v-if="showCollectionWords && !filteredCollectionTerms.length")
+  .q-px-md.absolute-center.full-width.text-center(v-if="showCollectionWords && !filteredCollectionWords.length")
     .text-h5.text-grey {{$t('There is nothing')}}
 q-footer
   q-btn-group(spread)
@@ -69,7 +69,7 @@ q-footer
       @click="$router.push(`/words/collections/${$route.params.name}`)"
     )
     q-btn(
-      :disabled="!(collectionName && collectionTerms.length)"
+      :disabled="!(collectionName && collectionWords.length)"
       color="teal"
       :label="$t('save')"
       style="width: 100%"
@@ -99,12 +99,12 @@ const router = useRouter();
 const scrollAreaHeight = ref();
 const showCollectionWords = ref(true);
 
-const vocabularyTerms = ref([]);
-const collectionTerms = ref([]);
+const words = ref([]);
+const collectionWords = ref([]);
 
 const collectionName = ref('');
 
-const filterTerms = (terms) => {
+const filterWords = (terms) => {
   return terms
     ?.filter((item) =>
       item.term.toLowerCase().includes(languagesStore.searchValue.toLowerCase())
@@ -112,56 +112,51 @@ const filterTerms = (terms) => {
     .sort((a, b) => a.term.localeCompare(b.term));
 };
 
-const filteredTerms = computed(() => {
-  return filterTerms(vocabularyTerms.value);
+const filteredWords = computed(() => {
+  return filterWords(words.value);
 });
 
-const filteredCollectionTerms = computed(() => {
-  return filterTerms(collectionTerms.value);
+const filteredCollectionWords = computed(() => {
+  return filterWords(collectionWords.value);
 });
 
 const addTerm = (id) => {
-  const termIndex = vocabularyTerms.value.findIndex((term) => term.id === id);
-  collectionTerms.value = [
-    vocabularyTerms.value[termIndex],
-    ...collectionTerms.value,
+  const termIndex = words.value.findIndex((term) => term.id === id);
+  collectionWords.value = [
+    words.value[termIndex],
+    ...collectionWords.value,
   ].sort((a, b) => a.term.localeCompare(b.term));
-  vocabularyTerms.value.splice(termIndex, 1);
+  words.value.splice(termIndex, 1);
 };
 
 const removeTerm = (id) => {
-  const termIndex = collectionTerms.value.findIndex((term) => term.id === id);
-  vocabularyTerms.value = [
-    collectionTerms.value[termIndex],
-    ...vocabularyTerms.value,
-  ];
-  collectionTerms.value.splice(termIndex, 1);
+  const termIndex = collectionWords.value.findIndex((term) => term.id === id);
+  words.value = [collectionWords.value[termIndex], ...words.value];
+  collectionWords.value.splice(termIndex, 1);
 };
 
 const saveCollection = async () => {
   if (!collectionName.value) return;
-  const termsIds = collectionTerms.value.map((term) => term.id);
+  const termsIds = collectionWords.value.map((term) => term.id);
   await editwordsCollection(route.params.name, collectionName.value, termsIds);
   await router.push(`/words/collections/${route.params.name}`);
 };
 
 onMounted(async () => {
-  const { terms } = await db.vocabularies
+  const data = await db.words
     .where('lang')
     .equals(languagesStore.currentLanguage)
-    .first();
+    .toArray();
 
-  const { terms: collectionTermsIds, name } = await db.wordsCollections
+  const { terms: collectionWordsIds, name } = await db.wordsCollections
     .where('lang')
     .equals(languagesStore.currentLanguage)
     .and((collection) => collection.name === route.params.name)
     .first();
 
-  vocabularyTerms.value = terms.filter(
-    (item) => !collectionTermsIds.includes(item.id)
-  );
-  collectionTerms.value = terms.filter((item) =>
-    collectionTermsIds.includes(item.id)
+  words.value = data.filter((item) => !collectionWordsIds.includes(item.id));
+  collectionWords.value = data.filter((item) =>
+    collectionWordsIds.includes(item.id)
   );
   collectionName.value = name;
   scrollAreaHeight.value =

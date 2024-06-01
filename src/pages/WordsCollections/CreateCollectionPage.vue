@@ -1,21 +1,21 @@
 <template lang="pug">
 q-page
-  div(v-if="filteredTerms")
+  div(v-if="filteredWords")
     q-input.q-pt-md.q-px-md(
       borderless
       v-model="collectionName"
       :placeholder="$t('collection name')"
       maxlength="20"
       )
-    SearchComponent(v-if="filteredTerms?.length").q-pb-md.q-px-md
-    .text-h6.bg-grey-3.q-px-md(v-if="filteredTerms?.length") Add words
-    ResponsiveScrollArea(v-if="filteredTerms?.length" :height="scrollAreaHeight")
+    SearchComponent(v-if="filteredWords?.length").q-pb-md.q-px-md
+    .text-h6.bg-grey-3.q-px-md(v-if="filteredWords?.length") Add words
+    ResponsiveScrollArea(v-if="filteredWords?.length" :height="scrollAreaHeight")
       q-item(
-        v-for="(item, index) in filteredTerms"
+        v-for="(item, index) in filteredWords"
         :key="item.id"
-        :style="(filteredTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
+        :style="(filteredWords.length-1 !== index) && {'border-bottom': '1px solid gray'}"
         dense
-        @click="addTerm(item.id)"
+        @click="addWord(item.id)"
         clickable
         )
         q-item-section
@@ -27,14 +27,14 @@ q-page
           color="positive"
           icon="add"
         )
-    .text-h6.bg-grey-3.q-px-md(v-if="addedTerms.length") Added words
-    ResponsiveScrollArea(v-if="addedTerms?.length" :height="scrollAreaHeight")
+    .text-h6.bg-grey-3.q-px-md(v-if="addedWords.length") Added words
+    ResponsiveScrollArea(v-if="addedWords?.length" :height="scrollAreaHeight")
       q-item(
-        v-for="(item, index) in addedTerms"
+        v-for="(item, index) in addedWords"
         :key="item.id"
-        :style="(addedTerms.length-1 !== index) && {'border-bottom': '1px solid gray'}"
+        :style="(addedWords.length-1 !== index) && {'border-bottom': '1px solid gray'}"
         dense
-        @click="removeTerm(item.id)"
+        @click="removeWord(item.id)"
         clickable
         )
         q-item-section
@@ -51,7 +51,7 @@ q-page
       color="warning"
       :label="$t('create new collection')"
       style="width: 100%"
-      @click="(collectionName && addedTerms.length) && createCollection()"
+      @click="(collectionName && addedWords.length) && createCollection()"
     )
 </template>
 
@@ -71,48 +71,44 @@ const { createWordsCollection } = useWordsCollections();
 const router = useRouter();
 const scrollAreaHeight = ref();
 const collectionName = ref('');
-const vocabularyTerms = ref();
-const addedTerms = ref([]);
+const words = ref();
+const addedWords = ref([]);
 
-const filteredTerms = computed(() => {
-  return vocabularyTerms.value
+const filteredWords = computed(() => {
+  return words.value
     ?.filter((item) =>
       item.term.toLowerCase().includes(languagesStore.searchValue.toLowerCase())
     )
     .sort((a, b) => a.term.localeCompare(b.term));
 });
 
-const addTerm = (id) => {
-  const termIndex = vocabularyTerms.value.findIndex((term) => term.id === id);
-  addedTerms.value = [
-    vocabularyTerms.value[termIndex],
-    ...addedTerms.value,
-  ].sort((a, b) => a.term.localeCompare(b.term));
-  vocabularyTerms.value.splice(termIndex, 1);
+const addWord = (id) => {
+  const termIndex = words.value.findIndex((term) => term.id === id);
+  addedWords.value = [words.value[termIndex], ...addedWords.value].sort(
+    (a, b) => a.term.localeCompare(b.term)
+  );
+  words.value.splice(termIndex, 1);
 };
 
-const removeTerm = (id) => {
-  const termIndex = addedTerms.value.findIndex((term) => term.id === id);
-  vocabularyTerms.value = [
-    addedTerms.value[termIndex],
-    ...vocabularyTerms.value,
-  ];
-  addedTerms.value.splice(termIndex, 1);
+const removeWord = (id) => {
+  const termIndex = addedWords.value.findIndex((term) => term.id === id);
+  words.value = [addedWords.value[termIndex], ...words.value];
+  addedWords.value.splice(termIndex, 1);
 };
 const createCollection = async () => {
-  if (!collectionName.value || !addedTerms.value) return;
-  const termsIds = addedTerms.value.map((term) => term.id);
-  await createWordsCollection(collectionName.value, termsIds);
+  if (!collectionName.value || !addedWords.value) return;
+  const wordsIds = addedWords.value.map((term) => term.id);
+  await createWordsCollection(collectionName.value, wordsIds);
   router.push('/words/collections');
 };
 
 onMounted(async () => {
-  const { terms } = await db.vocabularies
+  const data = await db.words
     .where('lang')
     .equals(languagesStore.currentLanguage)
-    .first();
+    .toArray();
 
-  vocabularyTerms.value = terms;
+  words.value = data;
 
   scrollAreaHeight.value =
     (document.getElementsByClassName('q-page')[0]?.clientHeight - 280) / 2 +

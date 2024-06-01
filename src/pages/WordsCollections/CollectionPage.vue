@@ -3,10 +3,10 @@ q-page
   q-header(elevated).bg-white.text-center
     q-toolbar
       q-toolbar-title.text-dark.text-capitalize {{ currentPageTitle }}
-  SearchComponent.q-px-md(v-if="filteredTerms?.length || languagesStore.searchValue")
-  ResponsiveScrollArea(v-if="filteredTerms?.length" :height="scrollAreaHeight")
+  SearchComponent.q-px-md(v-if="filteredWords?.length || languagesStore.searchValue")
+  ResponsiveScrollArea(v-if="filteredWords?.length" :height="scrollAreaHeight")
     q-item.q-px-none.list-item(
-      v-for="(item) in filteredTerms"
+      v-for="(item) in filteredWords"
       :key="item.id"
       :style="{'border-bottom': '1px solid gray'}"
       )
@@ -33,7 +33,7 @@ q-footer
       :label="$t('edit')"
       @click="$router.push(`/words/collections/edit/${$route.params.name}`)"
     )
-.q-px-md.absolute-center.full-width.text-center(v-if="!filteredTerms?.length")
+.q-px-md.absolute-center.full-width.text-center(v-if="!filteredWords?.length")
   .text-h5.text-grey {{$t('There is nothing')}}
 </template>
 
@@ -56,11 +56,10 @@ const { currentPageTitle } = useUtils();
 
 const scrollAreaHeight = ref();
 const collectionName = ref('');
-const vocabularyTerms = ref();
-const collectionTerms = ref([]);
-
-const filteredTerms = computed(() => {
-  return collectionTerms.value
+const words = ref();
+const collectionWords = ref([]);
+const filteredWords = computed(() => {
+  return collectionWords.value
     ?.filter(
       (item) =>
         item.term
@@ -74,10 +73,10 @@ const filteredTerms = computed(() => {
 });
 
 onMounted(async () => {
-  const { terms } = await db.vocabularies
+  const data = await db.words
     .where('lang')
     .equals(languagesStore.currentLanguage)
-    .first();
+    .toArray();
 
   const { terms: collectionTermsIds, name } = await db.wordsCollections
     .where('lang')
@@ -85,10 +84,8 @@ onMounted(async () => {
     .and((collection) => collection.name === route.params.name)
     .first();
 
-  vocabularyTerms.value = terms.filter(
-    (item) => !collectionTermsIds.includes(item.id)
-  );
-  collectionTerms.value = terms.filter((item) =>
+  words.value = data.filter((item) => !collectionTermsIds.includes(item.id));
+  collectionWords.value = data.filter((item) =>
     collectionTermsIds.includes(item.id)
   );
   collectionName.value = name;

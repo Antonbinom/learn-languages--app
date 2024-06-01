@@ -8,7 +8,7 @@ q-page.q-px-md
 <script setup>
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { onMounted, ref } from 'vue';
-const { getVocabulary } = useVocabulary();
+const { getAllWords } = useVocabulary();
 const links = ref([
   {
     name: 'sprint',
@@ -29,7 +29,7 @@ const links = ref([
 ]);
 
 onMounted(async () => {
-  const data = await getVocabulary();
-  data?.terms?.length < 4 && links.value.splice(2, 1);
+  const data = await getAllWords();
+  data?.length < 4 && links.value.splice(2, 1);
 });
 </script>

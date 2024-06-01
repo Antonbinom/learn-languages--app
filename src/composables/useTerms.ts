@@ -6,27 +6,26 @@ import { useSentences } from 'src/composables/useSentences';
 
 const useTerms = () => {
   const route = useRoute();
-  const { getVocabulary } = useVocabulary();
-  const { getPhrasalVerbs } = usePhrasalVerbs();
-  const { getIrregularVerbs } = useIrregularVerbs();
-  const { getSentences } = useSentences();
+  const { getAllWords } = useVocabulary();
+  const { getAllPhrasalVerbs } = usePhrasalVerbs();
+  const { getAllIrregularVerbs } = useIrregularVerbs();
+  const { getAllSentences } = useSentences();
 
   type Term = {
-    id: string;
+    id?: string;
     term: string | string[];
+    lang: string;
     translation: string;
+    explanation?: string;
     training: boolean;
   };
 
   const getTerms = async (): Promise<Term[]> => {
-    const routeActions: Record<
-      string,
-      () => Promise<{ terms: Term[] } | undefined>
-    > = {
-      '/trainings/words': getVocabulary,
-      '/trainings/phrasal-verbs': getPhrasalVerbs,
-      '/trainings/irregular-verbs': getIrregularVerbs,
-      '/trainings/sentences': getSentences,
+    const routeActions: Record<string, () => Promise<Term[] | undefined>> = {
+      '/trainings/words': getAllWords,
+      '/trainings/phrasal-verbs': getAllPhrasalVerbs,
+      '/trainings/irregular-verbs': getAllIrregularVerbs,
+      '/trainings/sentences': getAllSentences,
     };
 
     const fetchAction = Object.keys(routeActions).find((key) =>
@@ -37,7 +36,7 @@ const useTerms = () => {
 
     const data = await routeActions[fetchAction]();
 
-    return data?.terms?.filter((item) => item.training) || [];
+    return data?.filter((item) => item.training) || [];
   };
 
   return { getTerms };

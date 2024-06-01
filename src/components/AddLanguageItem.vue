@@ -11,12 +11,10 @@ q-item(
 </template>
 
 <script setup>
-import { useVocabulary } from 'src/composables/useVocabulary';
 // Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 //
-const { createVocabulary } = useVocabulary();
 const drawersStore = useDrawersStore();
 const languagesStore = useLanguagesStore();
 
@@ -25,7 +23,6 @@ defineProps({
 });
 
 const addLanguage = async (language) => {
-  await createVocabulary();
   languagesStore.setSelectedLanguages(language);
   if (!languagesStore.notSelectedLanguages.length) {
     drawersStore.setIsAddLanguageMenuOpen(false);

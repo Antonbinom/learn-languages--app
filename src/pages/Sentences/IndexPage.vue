@@ -22,24 +22,24 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 //
 const languagesStore = useLanguagesStore();
 
-const { getFilteredSentences } = useSentences();
+const { getSentences } = useSentences();
 
 const { $on } = useAppEventBus();
 
 let sentences = ref();
 
 $on('request-sentences', () => {
-  sentences.value = useObservable(getFilteredSentences());
+  sentences.value = useObservable(getSentences());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    sentences.value = useObservable(getFilteredSentences());
+    sentences.value = useObservable(getSentences());
   }
 );
 
 onMounted(async () => {
-  sentences.value = useObservable(getFilteredSentences());
+  sentences.value = useObservable(getSentences());
 });
 </script>
