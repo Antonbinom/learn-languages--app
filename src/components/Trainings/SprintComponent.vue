@@ -1,5 +1,5 @@
 <template lang="pug">
-CoundownComponent(:countdown="countdown")
+CoundownComponent(:countdown="countdown" :isTimeMode="isTimeMode" :stopTraining="stopTraining")
 .text-h5.text-bold.q-mb-lg {{ `${trainingMode === 'english - russian' ? questionTerm?.term : questionTerm?.translation}` }}
 .text-h6 {{ `${trainingMode !== 'english - russian' ? translationTerm?.term : translationTerm?.translation}` }}
 q-btn-group(spread flat).q-gutter-xl.q-pb-xl.absolute-bottom.q-px-md
@@ -12,11 +12,12 @@ import { ref, onMounted, onUnmounted } from 'vue';
 // Components
 import CoundownComponent from 'src/components/Trainings/CoundownComponent.vue';
 
-defineProps({
+const props = defineProps({
   trainingMode: String,
   questionTerm: Object,
   translationTerm: Object,
   setAnswer: Function,
+  isTimeMode: Boolean,
 });
 
 const emit = defineEmits(['onStopTraining']);
@@ -36,12 +37,16 @@ const runTrainingCountdown = () => {
   }, 10);
 };
 
+const stopTraining = () => {
+  emit('onStopTraining');
+};
+
 onMounted(() => {
-  runTrainingCountdown();
+  props.isTimeMode && runTrainingCountdown();
 });
 
 onUnmounted(() => {
-  clearInterval(trainingCountdownInterval);
+  props.isTimeMode && clearInterval(trainingCountdownInterval);
   emit('onStopTraining');
 });
 </script>

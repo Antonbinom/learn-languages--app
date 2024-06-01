@@ -8,15 +8,31 @@ q-dialog(
   )
   q-card(class="bg-white text-white")
     q-toolbar(class="text-dark text-center")
-      q-toolbar-title Edit {{ $t(currentPageTitle) }}
+      q-toolbar-title.text-capitalize {{ $t('edit') }} {{ $t(currentPageTitle) }}
+    q-card-section(v-if="route.path === '/irregular-verbs'" dense)
+      .text-h6.text-dark.text-capitalize {{ $t('terms') }}
+      .row.no-wrap.q-gutter-sm.q-mt-sm
+        q-input(
+          v-for="(input, index) in item.term"
+          :key="index"
+          v-model="item.term[index]"
+          :placeholder="$t('put value')"
+          dense
+          outlined
+          style="width: 100%"
+          )
+    q-card-section(v-else dense)
+      .text-h6.text-dark.text-capitalize {{ $t('term') }}
+      q-input(
+        v-model="item.term"
+        :placeholder="$t('put value')"
+        dense
+        )
     q-card-section(dense)
-     .text-h6.text-dark Term
-      q-input(v-model="item.term" placeholder="Input term" dense)
-    q-card-section(dense)
-      .text-h6.text-dark Translation
+      .text-h6.text-dark.text-capitalize {{ $t('translation') }}
       q-input(v-model="item.translation" placeholder="Input translation" dense)
     q-card-section(dense)
-      .text-h6.text-dark Explanation
+      .text-h6.text-dark.text-capitalize {{ $t('explanation') }}
       q-input(
         v-model="item.explanation"
         placeholder="Input text with description, examples, etc."
@@ -35,10 +51,10 @@ import { useRoute, useRouter } from 'vue-router';
 
 //Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
-import { useLanguagesStore } from 'src/stores/languagesStore';
+import { useTermsStore } from 'src/stores/termsStore';
 //
 const drawersStore = useDrawersStore();
-const languagesStore = useLanguagesStore();
+const termsStore = useTermsStore();
 
 //Composables
 import useUtils from 'src/composables/useUtils';
@@ -57,7 +73,6 @@ const route = useRoute();
 const router = useRouter();
 
 const item = ref({
-  id: '',
   term: '',
   translation: '',
   explanation: '',
@@ -69,18 +84,21 @@ const isEditTermOpen = computed(() => {
 });
 
 const isInputsValid = computed(() => {
-  return (
-    item.value?.term?.trim().length && item.value.translation?.trim().length
-  );
+  let termLength =
+    route.path === '/irregular-verbs'
+      ? !item.value.term.includes('')
+      : item.value.term.trim().length;
+  return termLength && item.value.translation.trim().length;
 });
 
-const editTerm = () => {
+const editTerm = async () => {
   if (!isInputsValid.value) return;
   const data = {
     ...item.value,
-    id: `${item.value.term.toLowerCase().split(', ').join('-')}-${
-      languagesStore.currentLanguage
-    }`,
+    term:
+      route.path === '/irregular-verbs'
+        ? item.value.term.join(', ')
+        : item.value.term,
   };
   const routeActions = {
     '/words/vocabulary': editVocabularyTerm,
@@ -90,27 +108,38 @@ const editTerm = () => {
   };
 
   const editAction = routeActions[route.path];
-  if (editAction) editAction(item.value.id, data);
+  if (!editAction) return;
+
+  await editAction(item.value.id, data, true);
 
   router.push({
-    query: { term: item.value.term.toLowerCase().split(', ').join('-') },
+    query: {
+      term: (route.path === '/irregular-verbs'
+        ? item.value.term
+        : item.value.term.split(', ')
+      )
+        .join('-')
+        .toLowerCase(),
+    },
   });
 };
 
 const closePopup = () => {
   drawersStore.setIsEditTermOpen(false);
   router.push({ query: {} });
+  termsStore.setCurrentTermId('');
 };
 
 onMounted(async () => {
+  const termId = termsStore.currentTermId;
   if (route.path === '/words/vocabulary') {
-    item.value = await getVocabularyTerm(route.query.term);
+    item.value = await getVocabularyTerm(termId);
   } else if (route.path === '/phrasal-verbs') {
-    item.value = await getPhrasalVerb(route.query.term);
+    item.value = await getPhrasalVerb(termId);
   } else if (route.path === '/irregular-verbs') {
-    item.value = await getIrregularVerb(route.query.term);
+    item.value = await getIrregularVerb(termId);
   } else if (route.path === '/sentences') {
-    item.value = await getSentence(route.query.term);
+    item.value = await getSentence(termId);
   }
 });
 </script>

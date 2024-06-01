@@ -1,7 +1,6 @@
 <template lang="pug">
 q-page
   SearchComponent.q-px-md(v-if="phrasalVerbs?.value?.length || languagesStore.searchValue")
-
   ListComponent(
     :items="phrasalVerbs")
   .q-px-md.absolute-center.full-width.text-center(v-if="!phrasalVerbs?.value?.length")
@@ -27,15 +26,14 @@ const { getFilteredPhrasalVerbs } = usePhrasalVerbs();
 
 const { $on } = useAppEventBus();
 
-let phrasalVerbs = ref();
-
+const phrasalVerbs = ref();
 $on('request-phrasal-verbs', () => {
   phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
-  async () => {
+  () => {
     phrasalVerbs.value = useObservable(getFilteredPhrasalVerbs());
   }
 );

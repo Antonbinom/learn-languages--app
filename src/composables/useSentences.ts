@@ -75,27 +75,24 @@ export const useSentences = () => {
     $emit('request-sentences');
   };
 
-  const getSentence = async (name: string) => {
+  const getSentence = async (id: string) => {
     const collection = await db.sentences
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const collectionItem = collection?.terms.find(
-      (term) => term.id.replace(`-${currentLanguage.value}`, '') === name
-    );
-    console.log(collection);
+    const collectionItem = collection?.terms.find((term) => term.id === id);
 
     return collectionItem;
   };
 
-  const removeSentence = async (termId: string) => {
+  const removeSentence = async (id: string) => {
     const collection = await db.sentences
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     db.sentences
@@ -106,16 +103,16 @@ export const useSentences = () => {
       });
   };
 
-  const editSentence = async (termId: string, data: Term) => {
-    if (await getSentence(data.term)) {
-      alreadyExists('sentence', data.term);
-    }
+  const editSentence = async (id: string, data: Term, refresh?: boolean) => {
+    // if (await getSentence(data.term)) {
+    //   alreadyExists('sentence', data.term);
+    // }
     const collection = await db.sentences
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     await db.sentences
@@ -124,7 +121,7 @@ export const useSentences = () => {
       .modify((collection) => {
         collection.terms[termIndex] = data;
       });
-    $emit('request-sentences');
+    refresh && $emit('request-sentences');
   };
 
   return {

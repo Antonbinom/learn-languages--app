@@ -4,6 +4,8 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
 import useAppEventBus from 'src/composables/useAppEventBus';
 import { useErrors } from './useErrors';
+import { phrasalVerbs } from 'src/data';
+import useUtils from 'src/composables/useUtils';
 
 interface Term {
   id: string;
@@ -15,6 +17,8 @@ interface Term {
 export const usePhrasalVerbs = () => {
   const { $emit } = useAppEventBus();
   const languagesStore = useLanguagesStore();
+  const { generateId } = useUtils();
+
   const currentLanguage = computed(() => {
     return languagesStore.currentLanguage;
   });
@@ -75,24 +79,47 @@ export const usePhrasalVerbs = () => {
     $emit('request-phrasal-verbs');
   };
 
-  const getPhrasalVerb = async (name: string) => {
-    const collection = await db.phrasalVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    return collection?.terms.find(
-      (term) => term.id === `${name}-${currentLanguage.value}`
-    );
+  const seedPhrasalVerbs = async () => {
+    if (!(await getPhrasalVerbs())) {
+      await createPhrasalVerbsCollection();
+      await db.phrasalVerbs
+        .where('lang')
+        .equals(currentLanguage.value)
+        .modify((collection) => {
+          phrasalVerbs.forEach(
+            (verb: {
+              term: string;
+              translation: string;
+              explanation?: string;
+            }) => {
+              collection.terms.push({
+                ...verb,
+                id: generateId(),
+                training: false,
+                explanation: '',
+              });
+            }
+          );
+        });
+    }
   };
 
-  const removePhrasalVerb = async (termId: string) => {
+  const getPhrasalVerb = async (id: string) => {
     const collection = await db.phrasalVerbs
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    return collection?.terms.find((term) => term.id === id);
+  };
+
+  const removePhrasalVerb = async (id: string) => {
+    const collection = await db.phrasalVerbs
+      .where('lang')
+      .equals(currentLanguage.value)
+      .first();
+
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     db.phrasalVerbs
@@ -103,16 +130,16 @@ export const usePhrasalVerbs = () => {
       });
   };
 
-  const editPhrasalVerb = async (termId: string, data: Term) => {
-    if (await getPhrasalVerb(data.term)) {
-      alreadyExists('phrasal verb', data.term);
-    }
+  const editPhrasalVerb = async (id: string, data: Term, refresh?: boolean) => {
+    // if (await getPhrasalVerb(data.term)) {
+    //   alreadyExists('phrasal verb', data.term);
+    // }
     const collection = await db.phrasalVerbs
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     await db.phrasalVerbs
@@ -121,7 +148,7 @@ export const usePhrasalVerbs = () => {
       .modify((collection) => {
         collection.terms[termIndex] = data;
       });
-    $emit('request-phrasal-verbs');
+    refresh && $emit('request-phrasal-verbs');
   };
 
   return {
@@ -132,5 +159,6 @@ export const usePhrasalVerbs = () => {
     addNewPhrasalVerb,
     removePhrasalVerb,
     editPhrasalVerb,
+    seedPhrasalVerbs,
   };
 };

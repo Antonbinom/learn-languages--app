@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page.q-pt-md
+q-page
   ResponsiveScrollArea(v-if="wordsCollections" :height="scrollAreaHeight")
     q-slide-item(
       right-color="negative"

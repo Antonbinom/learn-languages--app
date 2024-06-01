@@ -1,5 +1,5 @@
 <template lang="pug">
-q-input(
+q-input.q-pt-sm(
   v-model.trim="languagesStore.searchValue"
   debounce="500"
   placeholder="Search"

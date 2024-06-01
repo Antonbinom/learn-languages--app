@@ -26,10 +26,7 @@ export const useWordsCollections = () => {
     const wordsCollection = await db.wordsCollections
       .where('lang')
       .equals(currentLanguage.value)
-      .and(
-        (collection) =>
-          collection.name.toLocaleLowerCase() === name.toLowerCase()
-      )
+      .and((collection) => collection.name.toLowerCase() === name.toLowerCase())
       .first();
 
     return wordsCollection;

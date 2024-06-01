@@ -7,6 +7,8 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       :resetTraining="resetTraining"
       :startTraining="startTraining"
       :isCountdownRuns="isCountdownRuns"
+      @toggleTimeMode="isTimeMode = $event"
+      :isTimeMode="isTimeMode"
       )
     ModeTogglerComponent(
       v-if="isPresettings && !isCountdownRuns"
@@ -16,6 +18,7 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
     )
     SprintComponent(
       v-if="isTraining"
+      :isTimeMode="isTimeMode"
       :trainingMode="trainingMode"
       :questionTerm="questionTerm"
       :translationTerm="translationTerm"
@@ -53,6 +56,7 @@ const isCountdownRuns = ref(false);
 const status = ref('neutral');
 
 const trainingMode = ref(`${currentLanguage} - russian`);
+const isTimeMode = ref(true);
 
 const terms = ref([]);
 const passedTerms = ref([]);

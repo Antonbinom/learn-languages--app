@@ -1,5 +1,5 @@
 <template lang="pug">
-div {{ toggleValue }}
+span.text-capitalize {{ toggleValue }}
 q-toggle(
   color="teal"
   :false-value="`${currentLanguage} - russian`"

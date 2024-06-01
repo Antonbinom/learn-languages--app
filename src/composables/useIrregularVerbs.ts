@@ -4,6 +4,8 @@ import { useLanguagesStore } from 'src/stores/languagesStore';
 import { computed } from 'vue';
 import useAppEventBus from 'src/composables/useAppEventBus';
 import { useErrors } from './useErrors';
+import { irregularVerbs } from 'src/data';
+import useUtils from 'src/composables/useUtils';
 
 interface Term {
   id: string;
@@ -15,6 +17,7 @@ interface Term {
 export const useIrregularVerbs = () => {
   const { $emit } = useAppEventBus();
   const languagesStore = useLanguagesStore();
+  const { generateId } = useUtils();
   const currentLanguage = computed(() => {
     return languagesStore.currentLanguage;
   });
@@ -62,7 +65,13 @@ export const useIrregularVerbs = () => {
     if (!(await getIrregularVerbs())) {
       await createIrregularVerbsCollection();
     }
-    if (await getIrregularVerb(data.term)) {
+
+    const collection = await getIrregularVerbs();
+
+    const existingIrregularVerb = collection?.terms.find(
+      (item) => item.term === data.term
+    );
+    if (existingIrregularVerb) {
       alreadyExists('irregular verb', data.term);
     }
 
@@ -75,24 +84,48 @@ export const useIrregularVerbs = () => {
     $emit('request-irregular-verbs');
   };
 
-  const getIrregularVerb = async (name: string) => {
-    const collection = await db.irregularVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
-
-    return collection?.terms.find(
-      (term) => term.id === `${name}-${currentLanguage.value}`
-    );
+  const seedIrregularVerbs = async () => {
+    if (!(await getIrregularVerbs())) {
+      await createIrregularVerbsCollection();
+      await db.irregularVerbs
+        .where('lang')
+        .equals(currentLanguage.value)
+        .modify((collection) => {
+          irregularVerbs.forEach(
+            (verb: {
+              term: string;
+              translation: string;
+              explanation: string;
+            }) => {
+              collection.terms.push({
+                ...verb,
+                id: generateId(),
+                training: false,
+              });
+            }
+          );
+        });
+    }
   };
 
-  const removeIrregularVerb = async (termId: string) => {
-    const collection = await db.irregularVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
+  const getIrregularVerb = async (id: string) => {
+    const collection = await getIrregularVerbs();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    const data = collection?.terms.find((term) => term.id === id);
+    if (!data) return;
+    return {
+      id: data.id,
+      term: data.term.split(', '),
+      translation: data.translation,
+      training: data.training,
+      explanation: data.explanation,
+    };
+  };
+
+  const removeIrregularVerb = async (id: string) => {
+    const collection = await getIrregularVerbs();
+
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     db.irregularVerbs
@@ -103,16 +136,17 @@ export const useIrregularVerbs = () => {
       });
   };
 
-  const editIrregularVerb = async (termId: string, data: Term) => {
-    if (await getIrregularVerb(data.term)) {
-      alreadyExists('irregular verb', data.term);
-    }
-    const collection = await db.irregularVerbs
-      .where('lang')
-      .equals(currentLanguage.value)
-      .first();
+  const editIrregularVerb = async (
+    id: string,
+    data: Term,
+    refresh?: boolean
+  ) => {
+    // if (await getIrregularVerbByName(data.term)) {
+    //   alreadyExists('irregular verb', data.term);
+    // }
+    const collection = await getIrregularVerbs();
 
-    const termIndex = collection?.terms.findIndex((term) => term.id === termId);
+    const termIndex = collection?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     await db.irregularVerbs
@@ -121,9 +155,14 @@ export const useIrregularVerbs = () => {
       .modify((collection) => {
         collection.terms[termIndex] = data;
       });
-    $emit('request-irregular-verbs');
+    refresh && $emit('request-irregular-verbs');
   };
 
+  // const getIrregularVerbByName = async (name: string) => {
+  //   const collection = await getIrregularVerbs();
+
+  //   return collection?.terms.find((item) => item.term === name);
+  // };
   return {
     createIrregularVerbsCollection,
     getIrregularVerb,
@@ -132,5 +171,6 @@ export const useIrregularVerbs = () => {
     addNewIrregularVerb,
     removeIrregularVerb,
     editIrregularVerb,
+    seedIrregularVerbs,
   };
 };

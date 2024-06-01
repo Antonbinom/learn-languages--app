@@ -65,21 +65,19 @@ export const useVocabulary = () => {
     $emit('request-vocabulary');
   };
 
-  const getVocabularyTerm = async (name: string) => {
+  const getVocabularyTerm = async (id: string) => {
     const vocabulary = await getVocabulary();
 
-    return vocabulary?.terms.find(
-      (term) => term.id === `${name}-${currentLanguage.value}`
-    );
+    return vocabulary?.terms.find((term) => term.id === id);
   };
 
-  const removeVocabularyTerm = async (termId: string) => {
+  const removeVocabularyTerm = async (id: string) => {
     const vocabulary = await db.vocabularies
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = vocabulary?.terms.findIndex((term) => term.id === termId);
+    const termIndex = vocabulary?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     db.vocabularies
@@ -90,13 +88,17 @@ export const useVocabulary = () => {
       });
   };
 
-  const editVocabularyTerm = async (termId: string, data: Term) => {
+  const editVocabularyTerm = async (
+    id: string,
+    data: Term,
+    refresh?: boolean
+  ) => {
     const vocabulary = await db.vocabularies
       .where('lang')
       .equals(currentLanguage.value)
       .first();
 
-    const termIndex = vocabulary?.terms.findIndex((term) => term.id === termId);
+    const termIndex = vocabulary?.terms.findIndex((term) => term.id === id);
     if (termIndex === undefined) return;
 
     await db.vocabularies
@@ -105,7 +107,7 @@ export const useVocabulary = () => {
       .modify((vocabulary) => {
         vocabulary.terms[termIndex] = data;
       });
-    $emit('request-vocabulary');
+    refresh && $emit('request-vocabulary');
   };
 
   return {

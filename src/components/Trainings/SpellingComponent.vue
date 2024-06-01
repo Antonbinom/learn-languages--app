@@ -1,5 +1,5 @@
 <template lang="pug">
-CoundownComponent(:countdown="countdown")
+CoundownComponent(:countdown="countdown" :isTimeMode="isTimeMode" :stopTraining="stopTraining")
 .text-h5.text-bold.q-mb-lg {{ `${trainingMode === 'english - russian' ? questionTerm?.term : questionTerm?.translation}` }}
 .character-inputs(v-if="inputLength")
   //- props: inputs, inputLengthб setAnswer
@@ -93,12 +93,12 @@ const updateInputs = () => {
 };
 
 onMounted(() => {
-  runTrainingCountdown();
+  props.isTimeMode && runTrainingCountdown();
   updateInputs();
 });
 
 onUnmounted(() => {
-  clearInterval(trainingCountdownInterval);
+  props.isTimeMode && clearInterval(trainingCountdownInterval);
   emit('onStopTraining');
 });
 </script>

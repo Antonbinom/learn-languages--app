@@ -13,7 +13,7 @@ const useTerms = () => {
 
   type Term = {
     id: string;
-    term: string;
+    term: string | string[];
     translation: string;
     training: boolean;
   };

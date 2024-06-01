@@ -43,9 +43,10 @@ export const usePhrasalVerbsCollections = () => {
     changedName: string,
     termsIds: string[]
   ) => {
-    if (!(await getPhrasalVerbsCollection(changedName))) {
-      alreadyExists('phrasal verbs collection', name);
-    }
+    //TODO: Find the better way
+    // if (!(await getPhrasalVerbsCollection(changedName))) {
+    //   alreadyExists('phrasal verbs collection', name);
+    // }
     await db.phrasalVerbsCollections
       .where('lang')
       .equals(currentLanguage.value)

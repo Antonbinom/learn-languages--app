@@ -29,7 +29,7 @@ const links = ref([
 ]);
 
 onMounted(async () => {
-  const { terms } = await getVocabulary();
-  terms?.length < 4 && links.value.splice(2, 1);
+  const data = await getVocabulary();
+  data?.terms?.length < 4 && links.value.splice(2, 1);
 });
 </script>

@@ -3,7 +3,7 @@ ResponsiveScrollArea(v-if="itemsRef?.value" :height="scrollAreaHeight")
   q-slide-item(
     v-for="(item, index) in itemsRef.value"
     @right="removeTerm(item.id, index)"
-    @left="openEditTerm($event, item.term)"
+    @left="openEditTerm($event, item)"
     :key="item.id"
     right-color="negative"
     left-color="positive"
@@ -25,11 +25,24 @@ ResponsiveScrollArea(v-if="itemsRef?.value" :height="scrollAreaHeight")
         :hide-expand-icon="!item.explanation"
         expand-icon-toggle
         expand-separator
-        :caption="item.translation"
-        :label="`${item.term}`"
         )
+        //- :caption="item.translation"
+        //- :label="item.term"
+        //- icon="directions_run"
+        template(v-slot:header)
+          q-item-section.q-pr-none(avatar)
+            q-icon(:color="item.training ? 'positive' : 'grey'" name="directions_run")
+
+          q-item-section
+            span.text-bold {{item.term }}
+            span {{item.translation }}
+
         q-card(v-if="item.explanation")
           q-card-section.item-description {{ item.explanation }}
+    q-menu(touch-position)
+      q-list
+        q-item(clickable v-close-popup @click="toggleTraining(item)")
+          q-item-section.text-capitalize {{ $t(item.training ?  'remove from training' : 'add to training') }}
 q-footer
   q-btn.full-width(
     @click="drawersStore.setIsAddTermOpen(true)"
@@ -50,18 +63,21 @@ import EditTermDialog from 'src/components/EditTermDialog.vue';
 import ResponsiveScrollArea from 'src/components/ResponsiveScrollArea.vue';
 //Stores
 import { useDrawersStore } from 'src/stores/drawersStore';
+import { useTermsStore } from 'src/stores/termsStore';
 //
 const drawersStore = useDrawersStore();
+const termsStore = useTermsStore();
+
 // Composables
 import { useVocabulary } from 'src/composables/useVocabulary';
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
 import { useSentences } from 'src/composables/useSentences';
 //
-const { removeVocabularyTerm } = useVocabulary();
-const { removePhrasalVerb } = usePhrasalVerbs();
-const { removeIrregularVerb } = useIrregularVerbs();
-const { removeSentence } = useSentences();
+const { removeVocabularyTerm, editVocabularyTerm } = useVocabulary();
+const { removePhrasalVerb, editPhrasalVerb } = usePhrasalVerbs();
+const { removeIrregularVerb, editIrregularVerb } = useIrregularVerbs();
+const { removeSentence, editSentence } = useSentences();
 
 const route = useRoute();
 const router = useRouter();
@@ -85,26 +101,39 @@ const removeTerm = async (id, index) => {
   if (removeAction) removeAction(id);
 };
 
-// const addToTraining = ({ reset }, item) => {
-//   if (route.path === '/words/vocabulary') {
-//     editVocabularyTerm(item.id, { ...item, training: !item.training });
-//   } else if (route.path === '/phrasal-verbs') {
-//     editPhrasalVerb(item.id, { ...item, training: !item.training });
-//   }
-//   reset();
-// };
+const toggleTraining = async (item) => {
+  const data = {
+    ...item,
+    training: !item.training,
+  };
+  const routeActions = {
+    '/words/vocabulary': editVocabularyTerm,
+    '/phrasal-verbs': editPhrasalVerb,
+    '/irregular-verbs': editIrregularVerb,
+    '/sentences': editSentence,
+  };
 
-const openEditTerm = ({ reset }, term) => {
+  const editAction = routeActions[route.path];
+  if (!editAction) return;
+
+  await editAction(item.id, data);
+  item.training = !item.training;
+};
+
+const openEditTerm = ({ reset }, { id, term }) => {
   drawersStore.setIsEditTermOpen(true);
   router.push({ query: { term: term.toLowerCase().split(', ').join('-') } });
   reset();
+  termsStore.setCurrentTermId(id);
 };
 
 const scrollAreaHeight = ref();
 
 onMounted(() => {
+  router.push({ query: {} });
+
   scrollAreaHeight.value =
-    document.getElementsByClassName('q-page')[0]?.clientHeight - 140 + 'px';
+    document.getElementsByClassName('q-page')[0]?.clientHeight - 60 + 'px';
 });
 </script>
 
@@ -121,7 +150,6 @@ onMounted(() => {
     font-size: 14px;
     font-weight: normal;
     color: $positive;
-    // color: green;
   }
   & .item-description {
     color: rgba(0, 0, 0, 0.54);

@@ -11,19 +11,34 @@ q-knob.cursor-pointer(
   class="q-my-xl"
   @click="!isCountdownRuns && runPrestartingCountdown()"
   )
-  span {{ `${prestartingCountdown > 0 ? prestartingCountdown : 'Start'}`}}
+  span.text-capitalize {{ `${prestartingCountdown > 0 ? prestartingCountdown : $t('start')}`}}
+.full-width
+  span Time mode {{timeModeValue? $t('ON'):  $t('OFF') }}
+  q-toggle(
+    color="teal"
+    v-model="timeModeValue"
+    @update:model-value="toggleTimeMode()"
+    )
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
+const emit = defineEmits(['toggleTimeMode']);
+
 const props = defineProps({
   resetTraining: Function,
   startTraining: Function,
+  isTimeMode: Boolean,
   isCountdownRuns: Boolean,
 });
 
 const prestartingCountdown = ref(0);
+const timeModeValue = ref(props.isTimeMode);
+
+const toggleTimeMode = () => {
+  emit('toggleTimeMode', timeModeValue.value);
+};
 
 const runPrestartingCountdown = () => {
   props.resetTraining();

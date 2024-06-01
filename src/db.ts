@@ -11,7 +11,13 @@ export interface PhrasalVerbs {
 }
 export interface IrregularVerbs {
   lang: string;
-  terms: Term[];
+  terms: {
+    id: string;
+    term: string;
+    translation: string;
+    explanation: string;
+    training: boolean;
+  }[];
 }
 export interface Sentences {
   lang: string;
