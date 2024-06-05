@@ -1,61 +1,10 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="currentLanguageWords?.value?.length || languagesStore.searchValue || isTraining")
-  ListComponent(
-    :fetchFilteredData="fetchFilteredData"
-    :fetchData="fetchData"
-    :items="currentLanguageWords")
-  .q-px-md.absolute-center.full-width.text-center(v-if="!currentLanguageWords?.value?.length")
-    .text-h5.text-grey {{$t('There is nothing')}}
+  TermsList(:getTerms="getWords", event="request-words")
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { useObservable } from '@vueuse/rxjs';
+import TermsList from 'components/TermsList.vue';
 import { useVocabulary } from 'src/composables/useVocabulary';
-import useAppEventBus from 'src/composables/useAppEventBus';
-
-//Components
-import SearchComponent from 'components/SearchComponent.vue';
-import ListComponent from 'components/ListComponent.vue';
-
-//Stores
-import { useLanguagesStore } from 'src/stores/languagesStore';
-//
-const languagesStore = useLanguagesStore();
-
 const { getWords } = useVocabulary();
-
-const { $on } = useAppEventBus();
-
-const currentLanguageWords = ref();
-
-const isTraining = ref(false);
-const fetchData = (offset) => {
-  const data = useObservable(getWords(offset));
-  setTimeout(() => {
-    currentLanguageWords.value.value?.push(...data?.value);
-  }, 200);
-};
-
-const fetchFilteredData = (offset, trainingValue) => {
-  const data = useObservable(getWords(offset, trainingValue));
-  currentLanguageWords.value = data;
-  isTraining.value = trainingValue;
-};
-
-$on('request-words', () => {
-  currentLanguageWords.value = useObservable(getWords(0, isTraining.value));
-});
-
-watch(
-  () => languagesStore.searchValue || languagesStore.currentLanguage,
-  async () => {
-    currentLanguageWords.value = useObservable(getWords(0, isTraining.value));
-  }
-);
-
-onMounted(async () => {
-  currentLanguageWords.value = useObservable(getWords(0, false));
-});
 </script>

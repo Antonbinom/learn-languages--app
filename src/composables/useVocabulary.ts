@@ -27,7 +27,6 @@ export const useVocabulary = () => {
 
   const getWords = (offset = 0, trainingValue: boolean) => {
     const searchLower = languagesStore.searchValue?.toLowerCase();
-    console.log(trainingValue);
 
     return liveQuery(() =>
       db.words

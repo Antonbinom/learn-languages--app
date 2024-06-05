@@ -1,63 +1,10 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="irregularVerbs?.value?.length || languagesStore.searchValue || isTraining")
-  ListComponent(
-    :fetchData="fetchData"
-    :fetchFilteredData="fetchFilteredData"
-    :items="irregularVerbs")
-  .q-px-md.absolute-center.full-width.text-center(v-if="!irregularVerbs?.value?.length")
-    .text-h5.text-grey {{$t('There is nothing')}}
+  TermsList(:getTerms="getIrregularVerbs", event="request-irregular-verbs")
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { useObservable } from '@vueuse/rxjs';
+import TermsList from 'components/TermsList.vue';
 import { useIrregularVerbs } from 'src/composables/useIrregularVerbs';
-import useAppEventBus from 'src/composables/useAppEventBus';
-
-//Components
-import SearchComponent from 'components/SearchComponent.vue';
-import ListComponent from 'components/ListComponent.vue';
-
-//Stores
-import { useLanguagesStore } from 'src/stores/languagesStore';
-//
-const languagesStore = useLanguagesStore();
-
 const { getIrregularVerbs } = useIrregularVerbs();
-
-const { $on } = useAppEventBus();
-
-let irregularVerbs = ref();
-const isTraining = ref(false);
-
-const fetchData = (offset, trainingValue) => {
-  const data = useObservable(getIrregularVerbs(offset, trainingValue));
-  setTimeout(() => {
-    irregularVerbs.value.value?.push(...data?.value);
-  }, 200);
-};
-
-const fetchFilteredData = (offset, trainingValue) => {
-  const data = useObservable(getIrregularVerbs(offset, trainingValue));
-  irregularVerbs.value = data;
-  isTraining.value = trainingValue;
-};
-
-$on('request-irregular-verbs', () => {
-  irregularVerbs.value = useObservable(getIrregularVerbs(0, isTraining.value));
-});
-
-watch(
-  () => languagesStore.searchValue || languagesStore.currentLanguage,
-  async () => {
-    irregularVerbs.value = useObservable(
-      getIrregularVerbs(0, isTraining.value)
-    );
-  }
-);
-
-onMounted(async () => {
-  irregularVerbs.value = useObservable(getIrregularVerbs(0, isTraining.value));
-});
 </script>
