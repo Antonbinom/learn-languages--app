@@ -1,7 +1,9 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="currentLanguageWords?.value?.length || languagesStore.searchValue")
+  SearchComponent.q-px-md(v-if="currentLanguageWords?.value?.length || languagesStore.searchValue || isTraining")
   ListComponent(
+    :fetchFilteredData="fetchFilteredData"
+    :fetchData="fetchData"
     :items="currentLanguageWords")
   .q-px-md.absolute-center.full-width.text-center(v-if="!currentLanguageWords?.value?.length")
     .text-h5.text-grey {{$t('There is nothing')}}
@@ -26,20 +28,34 @@ const { getWords } = useVocabulary();
 
 const { $on } = useAppEventBus();
 
-let currentLanguageWords = ref();
+const currentLanguageWords = ref();
+
+const isTraining = ref(false);
+const fetchData = (offset) => {
+  const data = useObservable(getWords(offset));
+  setTimeout(() => {
+    currentLanguageWords.value.value?.push(...data?.value);
+  }, 200);
+};
+
+const fetchFilteredData = (offset, trainingValue) => {
+  const data = useObservable(getWords(offset, trainingValue));
+  currentLanguageWords.value = data;
+  isTraining.value = trainingValue;
+};
 
 $on('request-words', () => {
-  currentLanguageWords.value = useObservable(getWords());
+  currentLanguageWords.value = useObservable(getWords(0, isTraining.value));
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    currentLanguageWords.value = useObservable(getWords());
+    currentLanguageWords.value = useObservable(getWords(0, isTraining.value));
   }
 );
 
 onMounted(async () => {
-  currentLanguageWords.value = useObservable(getWords());
+  currentLanguageWords.value = useObservable(getWords(0, false));
 });
 </script>

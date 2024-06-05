@@ -11,7 +11,7 @@ q-knob(
   :color="isTimeMode? 'teal' : 'warning'"
   :center-color="isTimeMode? 'white' : 'warning'"
   track-color="grey"
-  class="q-my-xl"
+  :class="`q-my-xl ${isTimeMode ? '': 'cursor-pointer'}`"
   @click="!isTimeMode && stopTraining()"
 
   )

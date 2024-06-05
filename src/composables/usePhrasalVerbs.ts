@@ -24,18 +24,21 @@ export const usePhrasalVerbs = () => {
       .sortBy('term');
   };
 
-  const getPhrasalVerbs = () => {
+  const getPhrasalVerbs = (offset = 0, trainingValue?: boolean) => {
     const searchLower = languagesStore.searchValue?.toLowerCase();
-
     return liveQuery(() =>
       db.phrasalVerbs
         .where('lang')
         .equals(currentLanguage.value)
-        .and(
-          (item) =>
-            item.term.toLowerCase().includes(searchLower) ||
-            item.translation.toLowerCase().includes(searchLower)
-        )
+        .filter((item) => {
+          return (
+            (!trainingValue || item.training === trainingValue) &&
+            (item.term.toLowerCase().includes(searchLower) ||
+              item.translation.toLowerCase().includes(searchLower))
+          );
+        })
+        .offset(offset)
+        .limit(15)
         .sortBy('term')
     );
   };

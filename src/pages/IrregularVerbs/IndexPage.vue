@@ -1,8 +1,9 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="irregularVerbs?.value?.length || languagesStore.searchValue")
-
+  SearchComponent.q-px-md(v-if="irregularVerbs?.value?.length || languagesStore.searchValue || isTraining")
   ListComponent(
+    :fetchData="fetchData"
+    :fetchFilteredData="fetchFilteredData"
     :items="irregularVerbs")
   .q-px-md.absolute-center.full-width.text-center(v-if="!irregularVerbs?.value?.length")
     .text-h5.text-grey {{$t('There is nothing')}}
@@ -28,19 +29,35 @@ const { getIrregularVerbs } = useIrregularVerbs();
 const { $on } = useAppEventBus();
 
 let irregularVerbs = ref();
+const isTraining = ref(false);
+
+const fetchData = (offset, trainingValue) => {
+  const data = useObservable(getIrregularVerbs(offset, trainingValue));
+  setTimeout(() => {
+    irregularVerbs.value.value?.push(...data?.value);
+  }, 200);
+};
+
+const fetchFilteredData = (offset, trainingValue) => {
+  const data = useObservable(getIrregularVerbs(offset, trainingValue));
+  irregularVerbs.value = data;
+  isTraining.value = trainingValue;
+};
 
 $on('request-irregular-verbs', () => {
-  irregularVerbs.value = useObservable(getIrregularVerbs());
+  irregularVerbs.value = useObservable(getIrregularVerbs(0, isTraining.value));
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    irregularVerbs.value = useObservable(getIrregularVerbs());
+    irregularVerbs.value = useObservable(
+      getIrregularVerbs(0, isTraining.value)
+    );
   }
 );
 
 onMounted(async () => {
-  irregularVerbs.value = useObservable(getIrregularVerbs());
+  irregularVerbs.value = useObservable(getIrregularVerbs(0, isTraining.value));
 });
 </script>

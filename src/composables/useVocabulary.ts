@@ -25,18 +25,23 @@ export const useVocabulary = () => {
     return db.words.where({ lang: currentLanguage.value }).sortBy('term');
   };
 
-  const getWords = () => {
+  const getWords = (offset = 0, trainingValue: boolean) => {
     const searchLower = languagesStore.searchValue?.toLowerCase();
+    console.log(trainingValue);
 
     return liveQuery(() =>
       db.words
         .where('lang')
         .equals(currentLanguage.value)
-        .and(
-          (word) =>
-            word.term.toLowerCase().includes(searchLower) ||
-            word.translation.toLowerCase().includes(searchLower)
-        )
+        .filter((item) => {
+          return (
+            (!trainingValue || item.training === trainingValue) &&
+            (item.term.toLowerCase().includes(searchLower) ||
+              item.translation.toLowerCase().includes(searchLower))
+          );
+        })
+        .offset(offset)
+        .limit(15)
         .sortBy('term')
     );
   };

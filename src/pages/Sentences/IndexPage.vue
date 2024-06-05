@@ -1,7 +1,9 @@
 <template lang="pug">
 q-page
-  SearchComponent.q-px-md(v-if="sentences?.value?.length || languagesStore.searchValue")
+  SearchComponent.q-px-md(v-if="sentences?.value?.length || languagesStore.searchValue || isTraining")
   ListComponent(
+    :fetchData="fetchData"
+    :fetchFilteredData="fetchFilteredData"
     :items="sentences")
   .q-px-md.absolute-center.full-width.text-center(v-if="!sentences?.value?.length")
     .text-h5.text-grey {{$t('There is nothing')}}
@@ -27,19 +29,33 @@ const { getSentences } = useSentences();
 const { $on } = useAppEventBus();
 
 let sentences = ref();
+const isTraining = ref(false);
+
+const fetchData = (offset) => {
+  const data = useObservable(getSentences(offset));
+  setTimeout(() => {
+    sentences.value.value?.push(...data?.value);
+  }, 200);
+};
+
+const fetchFilteredData = (offset, trainingValue) => {
+  const data = useObservable(getSentences(offset, trainingValue));
+  sentences.value = data;
+  isTraining.value = trainingValue;
+};
 
 $on('request-sentences', () => {
-  sentences.value = useObservable(getSentences());
+  sentences.value = useObservable(getSentences(0, isTraining.value));
 });
 
 watch(
   () => languagesStore.searchValue || languagesStore.currentLanguage,
   async () => {
-    sentences.value = useObservable(getSentences());
+    sentences.value = useObservable(getSentences(0, isTraining.value));
   }
 );
 
 onMounted(async () => {
-  sentences.value = useObservable(getSentences());
+  sentences.value = useObservable(getSentences(0, isTraining.value));
 });
 </script>

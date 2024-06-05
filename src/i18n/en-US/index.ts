@@ -58,4 +58,10 @@ export default {
   OFF: 'OFF',
   stop: 'stop',
   start: 'start',
+  'complete the sentence': 'complete the sentence',
+  'Add phrasal verbs to training': 'Add phrasal verbs to training',
+  'Add irregular verbs to training': 'Add irregular verbs to training',
+  'Add words to training': 'Add words to training',
+  'Add sentences to training': 'Add sentences to training',
+  'sentences-constructor': 'sentences-constructor',
 };
