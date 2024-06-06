@@ -1,3 +1,12 @@
+export interface Term {
+  id?: string;
+  term: string | string[];
+  lang: string;
+  translation: string;
+  explanation?: string;
+  training: boolean;
+}
+
 export interface Word {
   id: string;
   term: string;

@@ -31,6 +31,7 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import CoundownComponent from 'src/components/Trainings/CoundownComponent.vue';
 import HintComponent from 'src/components/Trainings/HintComponent.vue';
 const props = defineProps({
+  isTimeMode: Boolean,
   trainingMode: String,
   questionTerm: Object,
   setAnswer: Function,
@@ -90,6 +91,10 @@ const updateInputs = () => {
   nextTick(() => {
     charInput.value[0].focus();
   });
+};
+
+const stopTraining = () => {
+  emit('onStopTraining');
 };
 
 onMounted(() => {

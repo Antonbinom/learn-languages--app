@@ -64,4 +64,6 @@ export default {
   'Add words to training': 'Add words to training',
   'Add sentences to training': 'Add sentences to training',
   'sentences-constructor': 'sentences-constructor',
+  'i know': 'i know',
+  "i don't know": "i don't know",
 };

@@ -8,8 +8,7 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       :startTraining="startTraining"
       :isCountdownRuns="isCountdownRuns"
       )
-
-    ModeTogglerComponent(
+    LanguageTogglerComponent(
       v-if="isPresettings && !isCountdownRuns"
       :currentLanguage="currentLanguage"
       :trainingMode="trainingMode"
@@ -27,62 +26,38 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       :results="results"
       :resetTraining="resetTraining"
     )
+
 </template>
 
 <script setup>
-import { computed, onMounted, ref, reactive } from 'vue';
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
-import ModeTogglerComponent from 'src/components/Trainings/ModeTogglerComponent.vue';
+import LanguageTogglerComponent from 'src/components/Trainings/LanguageTogglerComponent.vue';
 import RepeatComponent from 'src/components/Trainings/RepeatComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
+
 // Composables
-import useTerms from 'src/composables/useTerms';
-//Stores
-import { useLanguagesStore } from 'src/stores/languagesStore';
+import useTraining from 'src/composables/useTraining';
 //
-const { currentLanguage } = useLanguagesStore();
-
-const { getTerms } = useTerms();
-
-const isPresettings = ref(true);
-const isTraining = ref(false);
-const isResults = ref(false);
-const isCountdownRuns = ref(false);
-const status = ref('neutral');
-
-const trainingMode = ref(`${currentLanguage} - russian`);
-
-const terms = ref([]);
-const passedTerms = ref([]);
-const notPassedTerms = ref([]);
-const questionTerm = ref({});
-const results = reactive({
-  unknown: [],
-  correctAnswers: 0,
-  wrongAnswers: 0,
-  percents: 0,
-});
-
-const bodyColor = computed(() => {
-  if (status.value === 'correct') return 'bg-green-2';
-  else if (status.value === 'wrong') return 'bg-red-2';
-  else return '';
-});
-
-const moveTermToPassedTerms = () => {
-  const passedTermIndex = notPassedTerms.value.findIndex(
-    (item) => item.id === questionTerm.value.id
-  );
-  passedTerms.value.push(notPassedTerms.value[passedTermIndex]);
-  notPassedTerms.value.splice(passedTermIndex, 1);
-};
-
-const setQuestionTerm = () => {
-  const randomIndex = Math.floor(Math.random() * notPassedTerms.value.length);
-  questionTerm.value = notPassedTerms.value[randomIndex];
-};
+const {
+  isPresettings,
+  isTraining,
+  isResults,
+  isCountdownRuns,
+  status,
+  trainingMode,
+  notPassedTerms,
+  questionTerm,
+  results,
+  bodyColor,
+  startTraining,
+  stopTraining,
+  resetTraining,
+  setQuestionTerm,
+  currentLanguage,
+  moveTermToPassedTerms,
+} = useTraining();
 
 const setAnswer = (value) => {
   if (value) {
@@ -91,60 +66,20 @@ const setAnswer = (value) => {
   } else {
     status.value = 'wrong';
     results.wrongAnswers++;
+
     const unknownTermValue =
       trainingMode.value === 'english - russian'
         ? questionTerm.value?.term
         : questionTerm.value?.translation;
+
     results.unknown.push(unknownTermValue);
   }
   moveTermToPassedTerms();
 
   setTimeout(() => {
-    if (!notPassedTerms.value.length) {
-      stopTraining();
-    } else {
-      status.value = 'neutral';
-      setQuestionTerm();
-    }
+    if (!notPassedTerms.value.length) return stopTraining();
+    status.value = 'neutral';
+    setQuestionTerm();
   }, 200);
 };
-
-function startTraining() {
-  isPresettings.value = false;
-  isTraining.value = true;
-  isResults.value = false;
-}
-
-function stopTraining() {
-  isCountdownRuns.value = false;
-  isTraining.value = false;
-  isResults.value = true;
-  status.value = 'neutral';
-
-  const totalQuestions = results.correctAnswers + results.wrongAnswers;
-
-  if (totalQuestions) {
-    results.percents =
-      ((results.correctAnswers / totalQuestions) * 100).toFixed(0) || 0;
-  }
-}
-
-function resetTraining() {
-  isCountdownRuns.value = false;
-  isPresettings.value = true;
-  isTraining.value = false;
-  isResults.value = false;
-  notPassedTerms.value = [...terms.value];
-  passedTerms.value = [];
-  results.correctAnswers = 0;
-  results.wrongAnswers = 0;
-  results.percents = 0;
-  results.unknown = [];
-}
-
-onMounted(async () => {
-  terms.value = await getTerms();
-  notPassedTerms.value = [...terms.value];
-  setQuestionTerm();
-});
 </script>
