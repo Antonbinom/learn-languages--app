@@ -13,8 +13,8 @@ q-knob(
   class="q-my-xl"
   )
   span {{ results.percents }}%
-.text-h5(v-if="!results.unknown") {{$t('correct answers')}}: {{ results.correctAnswers }}
-.text-h5(v-if="!results.unknown") {{$t('wrong answers')}}: {{ results.wrongAnswers }}
+.text-h5(v-if="!results.unknown.length") {{$t('correct answers')}}: {{ results.correctAnswers }}
+.text-h5(v-if="!results.unknown.length") {{$t('wrong answers')}}: {{ results.wrongAnswers }}
 div(v-if="results.unknown?.length")
   .text-h5.q-mb-md {{ $t('unknown terms') }}
   q-chip(

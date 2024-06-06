@@ -6,20 +6,16 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       v-if="isPresettings"
       :resetTraining="resetTraining"
       :startTraining="startTraining"
-      :isCountdownRuns="isCountdownRuns"
-      @toggleTimeMode="isTimeMode = $event"
-      :isTimeMode="isTimeMode"
-      )
-    LanguageTogglerComponent(
-      v-if="isPresettings && !isCountdownRuns"
       :currentLanguage="currentLanguage"
-      :trainingMode="trainingMode"
-      @toggleTrainingMode="trainingMode = $event"
-    )
+      :languageMode="languageMode"
+      :isTimeMode="isTimeMode"
+      @toggleTimeMode="isTimeMode = $event"
+      @toggleLanguageMode="languageMode = $event"
+      )
     SprintComponent(
       v-if="isTraining"
       :isTimeMode="isTimeMode"
-      :trainingMode="trainingMode"
+      :languageMode="languageMode"
       :questionTerm="questionTerm"
       :translationTerm="translationTerm"
       :setAnswer="setAnswer"
@@ -32,10 +28,9 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
     )
 </template>
 
-<script setup>
+<script setup lang="ts">
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
-import LanguageTogglerComponent from 'src/components/Trainings/LanguageTogglerComponent.vue';
 import SprintComponent from 'src/components/Trainings/SprintComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
@@ -47,9 +42,8 @@ const {
   isPresettings,
   isTraining,
   isResults,
-  isCountdownRuns,
   status,
-  trainingMode,
+  languageMode,
   isTimeMode,
   notPassedTerms,
   questionTerm,
@@ -65,8 +59,8 @@ const {
   setTranslationTerm,
 } = useTraining();
 
-const setAnswer = (value) => {
-  const isTermsEqual = questionTerm.value.term === translationTerm.value.term;
+const setAnswer = (value: boolean) => {
+  const isTermsEqual = questionTerm.value?.term === translationTerm.value?.term;
   if (isTermsEqual && value) {
     moveTermToPassedTerms();
     status.value = 'correct';

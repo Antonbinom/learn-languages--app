@@ -1,6 +1,6 @@
 <template lang="pug">
 CoundownComponent(:countdown="countdown" :isTimeMode="isTimeMode" :stopTraining="stopTraining")
-.text-h5.text-bold.q-mb-lg {{ `${trainingMode === 'english - russian' ? questionTerm?.term : questionTerm?.translation}` }}
+.text-h5.text-bold.q-mb-lg {{ `${languageMode === 'english - russian' ? questionTerm?.term : questionTerm?.translation}` }}
 .character-inputs(v-if="inputLength")
   //- props: inputs, inputLengthб setAnswer
   //- handleInput: inputLength, charInput
@@ -16,7 +16,7 @@ CoundownComponent(:countdown="countdown" :isTimeMode="isTimeMode" :stopTraining=
     ref="charInput"
     maxlength="1"
     class="character-input")
-HintComponent(:hint="trainingMode === 'english - russian' ? questionTerm?.translation : questionTerm?.term")
+HintComponent(:hint="languageMode === 'english - russian' ? questionTerm?.translation : questionTerm?.term")
 q-btn.fixed-bottom.q-mb-md(
   color="warning"
   :label="$t('next')"
@@ -25,60 +25,56 @@ q-btn.fixed-bottom.q-mb-md(
 
 </template>
 
-<script setup>
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
+<script setup lang="ts">
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 // Components
 import CoundownComponent from 'src/components/Trainings/CoundownComponent.vue';
 import HintComponent from 'src/components/Trainings/HintComponent.vue';
-const props = defineProps({
-  isTimeMode: Boolean,
-  trainingMode: String,
-  questionTerm: Object,
-  setAnswer: Function,
-});
+// Composables
+import useTrainingCountdown from 'src/composables/useTrainingCountdown';
+import { Term } from 'src/components/models';
 
+interface Props {
+  isTimeMode: boolean;
+  languageMode: string;
+  questionTerm: Term;
+  translationTerm: Term;
+  setAnswer: (value: string) => void;
+}
+
+const props = defineProps<Props>();
 const emit = defineEmits(['onStopTraining']);
 
-const inputs = ref();
-const charInput = ref([]);
-const countdown = ref(6000);
+const { countdown, stopTraining } = useTrainingCountdown(props, emit);
+
+const inputs = ref<string[]>([]);
+const charInput = ref<(HTMLInputElement | null)[]>([]);
+
 const inputLength = computed(() => {
   return (
-    props.trainingMode !== 'english - russian'
+    (props.languageMode !== 'english - russian'
       ? props.questionTerm?.term
       : props.questionTerm?.translation
-  )?.length;
+    )?.length || 0
+  );
 });
 
-const handleInput = (event, index) => {
+const handleInput = (event: InputEvent, index: number) => {
   if (event.inputType === 'insertText') {
     if (index < inputLength.value - 1) {
       nextTick(() => {
-        charInput.value[index + 1].focus();
+        charInput.value[index + 1]?.focus();
       });
     }
   }
 };
 
-const handleBackspace = (event, index) => {
+const handleBackspace = (event: KeyboardEvent, index: number) => {
   if (index > 0 && inputs.value[index] === '') {
     nextTick(() => {
-      charInput.value[index - 1].focus();
+      charInput.value[index - 1]?.focus();
     });
   }
-};
-
-let trainingCountdownInterval;
-
-const runTrainingCountdown = () => {
-  trainingCountdownInterval = setInterval(() => {
-    if (countdown.value > 1) {
-      countdown.value--;
-    } else {
-      clearInterval(trainingCountdownInterval);
-      emit('onStopTraining');
-    }
-  }, 10);
 };
 
 watch(
@@ -89,22 +85,12 @@ watch(
 const updateInputs = () => {
   inputs.value = new Array(inputLength.value).fill('');
   nextTick(() => {
-    charInput.value[0].focus();
+    charInput.value[0]?.focus();
   });
 };
 
-const stopTraining = () => {
-  emit('onStopTraining');
-};
-
 onMounted(() => {
-  props.isTimeMode && runTrainingCountdown();
   updateInputs();
-});
-
-onUnmounted(() => {
-  props.isTimeMode && clearInterval(trainingCountdownInterval);
-  emit('onStopTraining');
 });
 </script>
 

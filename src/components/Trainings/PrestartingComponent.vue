@@ -9,38 +9,61 @@ q-knob.cursor-pointer(
   center-color="white"
   track-color="teal"
   class="q-my-xl"
-  @click="!isCountdownRuns && runPrestartingCountdown()"
+  @click="runPrestartingCountdown()"
   )
   span.text-capitalize {{ `${prestartingCountdown > 0 ? prestartingCountdown : $t('start')}`}}
-.full-width
+
+.full-width(v-if="$route.path !== '/trainings/words/repeat'")
   span Time mode {{timeModeValue? $t('ON'):  $t('OFF') }}
   q-toggle(
     color="teal"
     v-model="timeModeValue"
     @update:model-value="toggleTimeMode()"
+    :disable="isCountdownRuns"
     )
+.full-width
+  span.text-capitalize {{ languageModeValue }}
+  q-toggle(
+  color="teal"
+  :false-value="`${currentLanguage} - russian`"
+  :true-value="`russian - ${currentLanguage}`"
+  v-model="languageModeValue"
+  @update:model-value="toggleLanguageMode()"
+  :disable="isCountdownRuns"
+  )
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-const emit = defineEmits(['toggleTimeMode']);
+const emit = defineEmits(['toggleTimeMode', 'toggleLanguageMode']);
 
 const props = defineProps({
   resetTraining: Function,
   startTraining: Function,
   isTimeMode: Boolean,
-  isCountdownRuns: Boolean,
+  languageMode: String,
+  currentLanguage: String,
 });
 
 const prestartingCountdown = ref(0);
+const isCountdownRuns = ref(false);
 const timeModeValue = ref(props.isTimeMode);
+const languageModeValue = ref(props.languageMode);
 
 const toggleTimeMode = () => {
   emit('toggleTimeMode', timeModeValue.value);
 };
 
+const toggleLanguageMode = () => {
+  emit('toggleLanguageMode', languageModeValue.value);
+};
+
 const runPrestartingCountdown = () => {
+  if (isCountdownRuns.value) return;
+  if (!timeModeValue.value) return props.startTraining();
+
+  isCountdownRuns.value = true;
   props.resetTraining();
   prestartingCountdown.value = 3;
   const countdownInterval = setInterval(() => {

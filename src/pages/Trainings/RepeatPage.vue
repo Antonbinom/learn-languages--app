@@ -6,17 +6,13 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       v-if="isPresettings"
       :resetTraining="resetTraining"
       :startTraining="startTraining"
-      :isCountdownRuns="isCountdownRuns"
-      )
-    LanguageTogglerComponent(
-      v-if="isPresettings && !isCountdownRuns"
       :currentLanguage="currentLanguage"
-      :trainingMode="trainingMode"
-      @toggleTrainingMode="trainingMode = $event"
-    )
+      :languageMode="languageMode"
+      @toggleLanguageMode="languageMode = $event"
+      )
     RepeatComponent(
       v-if="isTraining"
-      :trainingMode="trainingMode"
+      :languageMode="languageMode"
       :questionTerm="questionTerm"
       :setAnswer="setAnswer"
       @onStopTraining="stopTraining"
@@ -29,10 +25,9 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
 
 </template>
 
-<script setup>
+<script setup lang="ts">
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
-import LanguageTogglerComponent from 'src/components/Trainings/LanguageTogglerComponent.vue';
 import RepeatComponent from 'src/components/Trainings/RepeatComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
@@ -40,13 +35,13 @@ import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
 // Composables
 import useTraining from 'src/composables/useTraining';
 //
+
 const {
   isPresettings,
   isTraining,
   isResults,
-  isCountdownRuns,
   status,
-  trainingMode,
+  languageMode,
   notPassedTerms,
   questionTerm,
   results,
@@ -59,7 +54,7 @@ const {
   moveTermToPassedTerms,
 } = useTraining();
 
-const setAnswer = (value) => {
+const setAnswer = (value: boolean) => {
   if (value) {
     status.value = 'correct';
     results.correctAnswers++;
@@ -68,9 +63,9 @@ const setAnswer = (value) => {
     results.wrongAnswers++;
 
     const unknownTermValue =
-      trainingMode.value === 'english - russian'
-        ? questionTerm.value?.term
-        : questionTerm.value?.translation;
+      languageMode.value === `${currentLanguage} - russian`
+        ? questionTerm.value?.term || ''
+        : questionTerm.value?.translation || '';
 
     results.unknown.push(unknownTermValue);
   }

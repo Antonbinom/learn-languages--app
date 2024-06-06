@@ -1,19 +1,19 @@
 <template lang="pug">
 q-page.q-px-md
-  .q-py-md.q-gutter-sm.column(v-if="trainingTermsLength.length !== 0")
+  .q-py-md.q-gutter-sm.column(v-if="trainingTermsLength !== 0")
     router-link(v-for="link in links" :key="link.name" :to="link.path")
       q-btn(color="white" text-color="dark" style="width: 100%") {{$t(link.name)}}
   .q-px-md.absolute-center.full-width.text-center(v-else)
     .text-h5.text-grey {{$t('Add phrasal verbs to training')}}
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { usePhrasalVerbs } from 'src/composables/usePhrasalVerbs';
 import { ref, onMounted } from 'vue';
 
 const { getAllPhrasalVerbs } = usePhrasalVerbs();
 
-const trainingTermsLength = ref(0);
+const trainingTermsLength = ref<number>(0);
 
 const links = ref([
   {
@@ -40,7 +40,8 @@ const links = ref([
 
 onMounted(async () => {
   const data = await getAllPhrasalVerbs();
-  trainingTermsLength.value = data?.filter((item) => item.training === true);
-  trainingTermsLength.value.length < 4 && links.value.splice(2, 1);
+  const filteredData = data?.filter((item) => item.training === true);
+  trainingTermsLength.value = filteredData.length;
+  trainingTermsLength.value < 4 && links.value.splice(2, 1);
 });
 </script>

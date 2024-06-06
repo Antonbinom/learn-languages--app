@@ -1,6 +1,6 @@
 export interface Term {
   id?: string;
-  term: string | string[];
+  term: string;
   lang: string;
   translation: string;
   explanation?: string;

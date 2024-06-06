@@ -2,6 +2,7 @@ import { computed, onMounted, ref, reactive } from 'vue';
 import { useLanguagesStore } from 'src/stores/languagesStore';
 import useTerms from 'src/composables/useTerms';
 import { Term } from 'src/components/models';
+
 export default function useTraining() {
   const { currentLanguage } = useLanguagesStore();
   const { getTerms } = useTerms();
@@ -9,10 +10,9 @@ export default function useTraining() {
   const isPresettings = ref<boolean>(true);
   const isTraining = ref<boolean>(false);
   const isResults = ref<boolean>(false);
-  const isCountdownRuns = ref<boolean>(false);
   const status = ref<string>('neutral');
 
-  const trainingMode = ref<string>(`${currentLanguage} - russian`);
+  const languageMode = ref<string>(`${currentLanguage} - russian`);
   const isTimeMode = ref<boolean>(true);
 
   const terms = ref<Term[]>([]);
@@ -22,7 +22,12 @@ export default function useTraining() {
   const questionTerm = ref<Term>();
   const translationTerm = ref<Term>();
 
-  const results = reactive({
+  const results = reactive<{
+    correctAnswers: number;
+    wrongAnswers: number;
+    percents: number;
+    unknown: string[];
+  }>({
     correctAnswers: 0,
     wrongAnswers: 0,
     percents: 0,
@@ -88,7 +93,7 @@ export default function useTraining() {
 
   const setAnswer = (value: string) => {
     const isTermsEqual =
-      (trainingMode.value === `${currentLanguage} - russian`
+      (languageMode.value === `${currentLanguage} - russian`
         ? questionTerm.value?.translation
         : questionTerm.value?.term) === value;
     if (isTermsEqual) {
@@ -114,7 +119,6 @@ export default function useTraining() {
   }
 
   function stopTraining() {
-    isCountdownRuns.value = false;
     isTraining.value = false;
     isResults.value = true;
     status.value = 'neutral';
@@ -128,7 +132,6 @@ export default function useTraining() {
   }
 
   function resetTraining() {
-    isCountdownRuns.value = false;
     isPresettings.value = true;
     isTraining.value = false;
     isResults.value = false;
@@ -153,9 +156,8 @@ export default function useTraining() {
     isPresettings,
     isTraining,
     isResults,
-    isCountdownRuns,
     status,
-    trainingMode,
+    languageMode,
     isTimeMode,
     terms,
     passedTerms,

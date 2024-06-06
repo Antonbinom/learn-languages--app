@@ -5,6 +5,6 @@ q-page.q-px-md
       q-btn(color="white" text-color="dark" style="width: 100%") {{ $t(page.name) }}
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { pages } from '../data';
 </script>

@@ -7,16 +7,16 @@ q-knob(
   :min="0"
   :max="6000"
   size="150px"
-  :thickness="0.05"
-  :color="isTimeMode? 'teal' : 'warning'"
-  :center-color="isTimeMode? 'white' : 'warning'"
+  :thickness="isTimeMode? 0.05: 0.02"
+  color="teal"
+  center-color="white"
   track-color="grey"
   :class="`q-my-xl ${isTimeMode ? '': 'cursor-pointer'}`"
   @click="!isTimeMode && stopTraining()"
 
   )
   span(v-if="isTimeMode") {{ Math.ceil(countdown/100) }}
-  span.text-white.text-capitalize(v-if="!isTimeMode") {{ $t('stop') }}
+  span.text-black.text-capitalize(v-if="!isTimeMode") {{ $t('stop') }}
 </template>
 
 <script setup>

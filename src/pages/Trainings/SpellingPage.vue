@@ -6,20 +6,16 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
       v-if="isPresettings"
       :resetTraining="resetTraining"
       :startTraining="startTraining"
-      :isCountdownRuns="isCountdownRuns"
-      @toggleTimeMode="isTimeMode = $event"
-      :isTimeMode="isTimeMode"
-      )
-    LanguageTogglerComponent(
-      v-if="isPresettings && !isCountdownRuns"
       :currentLanguage="currentLanguage"
-      :trainingMode="trainingMode"
-      @toggleTrainingMode="trainingMode = $event"
-    )
+      :languageMode="languageMode"
+      :isTimeMode="isTimeMode"
+      @toggleTimeMode="isTimeMode = $event"
+      @toggleLanguageMode="languageMode = $event"
+      )
     SpellingComponent(
       v-if="isTraining"
       :isTimeMode="isTimeMode"
-      :trainingMode="trainingMode"
+      :languageMode="languageMode"
       :questionTerm="questionTerm"
       :setAnswer="setAnswer"
       @onStopTraining="stopTraining"
@@ -31,10 +27,9 @@ q-page(:class="['q-px-md', 'text-center', bodyColor]")
     )
 </template>
 
-<script setup>
+<script setup lang="ts">
 //Components
 import PrestartingComponent from 'src/components/Trainings/PrestartingComponent.vue';
-import LanguageTogglerComponent from 'src/components/Trainings/LanguageTogglerComponent.vue';
 import SpellingComponent from 'src/components/Trainings/SpellingComponent.vue';
 import ResultsComponent from 'src/components/Trainings/ResultsComponent.vue';
 import ButtonClose from 'src/components/Trainings/ButtonClose.vue';
@@ -46,9 +41,8 @@ const {
   isPresettings,
   isTraining,
   isResults,
-  isCountdownRuns,
   status,
-  trainingMode,
+  languageMode,
   isTimeMode,
   notPassedTerms,
   questionTerm,
@@ -62,11 +56,11 @@ const {
   moveTermToPassedTerms,
 } = useTraining();
 //*
-const setAnswer = (value) => {
+const setAnswer = (value: string) => {
   const isTermsEqual =
-    (trainingMode.value === `${currentLanguage} - russian`
-      ? questionTerm.value.translation
-      : questionTerm.value.term) === value;
+    (languageMode.value === `${currentLanguage} - russian`
+      ? questionTerm.value?.translation
+      : questionTerm.value?.term) === value;
   if (isTermsEqual) {
     moveTermToPassedTerms();
     status.value = 'correct';
